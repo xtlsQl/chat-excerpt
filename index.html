@@ -112,7 +112,7 @@ input[type=range]{flex:1;accent-color:var(--accent);cursor:pointer;}
       <div class="section-label">캔버스 비율</div>
       <div class="ratio-row">
         <div class="ratio-btn active" data-ratio="1:1">1:1</div>
-        <div class="ratio-btn" data-ratio="4:5">4:5</div>
+        <div class="ratio-btn" data-ratio="3:4">3:4</div>
         <div class="ratio-btn" data-ratio="16:9">16:9</div>
       </div>
     </div>
@@ -246,7 +246,7 @@ let cfg = {
 
 function getRatioWH(ratio, baseW) {
   if (ratio === '1:1')  return [baseW, baseW];
-  if (ratio === '4:5')  return [baseW, Math.round(baseW * 5 / 4)];
+  if (ratio === '3:4')  return [baseW, Math.round(baseW * 4 / 3)];
   if (ratio === '16:9') return [baseW, Math.round(baseW * 9 / 16)];
   return [baseW, baseW];
 }
