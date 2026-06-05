@@ -10,15 +10,15 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 :root{
-  --bg:#1a1714;--panel:#201e1b;--panel2:#252220;--border:#3a3630;
-  --text:#e8e2d9;--muted:#8a8278;--accent:#c9a96e;--accent2:#8b6f47;
+  --bg:#f7f7f7;--panel:#ffffff;--panel2:#f0f0f0;--border:#e0dbd0;
+  --text:#1a1410;--muted:#6b6055;--accent:#c9a96e;--accent2:#8b6f47;
 }
 html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-serif;}
 .app{display:grid;grid-template-columns:340px 1fr;height:100vh;}
 .sidebar{background:var(--panel);border-right:1px solid var(--border);padding:20px;overflow-y:auto;display:flex;flex-direction:column;gap:14px;}
 .main{padding:24px;overflow-y:auto;display:flex;flex-direction:column;align-items:center;gap:16px;background:var(--bg);}
 .canvas-wrap{width:100%;max-width:600px;}
-.logo{font-family:'Nanum Myeongjo',serif;font-size:15px;color:var(--accent);letter-spacing:0.12em;padding-bottom:14px;border-bottom:1px solid var(--border);}
+.logo{font-family:'Nanum Myeongjo',serif;font-size:15px;color:var(--accent2);letter-spacing:0.12em;padding-bottom:14px;border-bottom:1px solid var(--border);}
 .section-label{font-size:11px;color:var(--muted);letter-spacing:0.1em;margin-bottom:7px;text-transform:uppercase;}
 textarea{width:100%;background:var(--panel2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'Noto Sans KR',sans-serif;font-size:13px;line-height:1.7;padding:12px;resize:vertical;outline:none;min-height:160px;}
 textarea:focus{border-color:var(--accent2);}
@@ -68,7 +68,7 @@ input[type=range]{flex:1;accent-color:var(--accent);cursor:pointer;}
 /* 캔버스 헤더 (PC에서는 로고 숨김) */
 .canvas-header{display:none;}
 .canvas-divider{height:1px;background:var(--border);margin:4px 0;}
-.canvas-logo{font-family:'Nanum Myeongjo',serif;font-size:14px;color:var(--accent);letter-spacing:0.12em;}
+.canvas-logo{font-family:'Nanum Myeongjo',serif;font-size:14px;color:var(--accent2);letter-spacing:0.12em;}
 
 @media(max-width:760px){
   html,body{height:100%;overflow:hidden;}
