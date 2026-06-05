@@ -10,8 +10,8 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 :root{
-  --bg:#f7f7f7;--panel:#ffffff;--panel2:#f0f0f0;--border:#e0dbd0;
-  --text:#1a1410;--muted:#6b6055;--accent:#c9a96e;--accent2:#8b6f47;
+  --bg:#fff5f7;--panel:#ffffff;--panel2:#fff0f3;--border:#f5c9d6;
+  --text:#2d1018;--muted:#b06070;--accent:#e8789a;--accent2:#c94f72;
 }
 html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-serif;}
 .app{display:grid;grid-template-columns:340px 1fr;height:100vh;}
@@ -56,10 +56,10 @@ input[type=range]{flex:1;accent-color:var(--accent);cursor:pointer;}
 .canvas-btns .action-btn{width:auto;flex:1;}
 
 .canvas-outer{width:100%;display:flex;justify-content:center;}
-#previewCanvas{border-radius:6px;display:block;width:100%;height:auto;}
+#previewCanvas{border-radius:6px;display:block;width:100%;height:auto;box-shadow:0 0 0 1px #f5c9d6,0 2px 12px rgba(201,79,114,0.08);}
 .hint-box{background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:11px 13px;}
 .hint-box p{font-size:12px;color:var(--muted);line-height:1.9;}
-.hint-box code{font-size:11px;background:#2a2822;padding:1px 5px;border-radius:3px;color:var(--accent);}
+.hint-box code{font-size:11px;background:#ffd6e3;padding:1px 5px;border-radius:3px;color:var(--accent2);}
 .divider{height:1px;background:var(--border);}
 .color-pair{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
 .color-label{font-size:11px;color:var(--muted);margin-bottom:5px;}
@@ -122,7 +122,7 @@ input[type=range]{flex:1;accent-color:var(--accent);cursor:pointer;}
 
     <div class="hint-box">
       <p>
-        <code>*지문*</code> → <em style="color:#c9a96e;font-style:italic;">이탤릭 · 연한 색</em><br>
+        <code>*지문*</code> → <em style="color:#e8789a;font-style:italic;">이탤릭 · 연한 색</em><br>
         <code>"대사"</code> → 따옴표 제거 후 기본 폰트 (굽은따옴표도 OK)<br>
         문장 중간 혼용도 가능 · 빈 줄로 단락 구분
       </p>
@@ -202,7 +202,8 @@ input[type=range]{flex:1;accent-color:var(--accent);cursor:pointer;}
     <div class="control-group">
       <div class="section-label">배경 프리셋</div>
       <div class="color-row" id="bgPresets">
-        <div class="color-swatch active" data-bg="#f5f0e8" data-fg="#1a1714" style="background:#f5f0e8;"></div>
+        <div class="color-swatch active" data-bg="#ffffff" data-fg="#111111" style="background:#ffffff;border:1px solid #e0d0d5;"></div>
+        <div class="color-swatch" data-bg="#f5f0e8" data-fg="#1a1714" style="background:#f5f0e8;"></div>
         <div class="color-swatch" data-bg="#faf8f4" data-fg="#1a1714" style="background:#faf8f4;"></div>
         <div class="color-swatch" data-bg="#1a1714" data-fg="#e8e2d9" style="background:#1a1714;border:1px solid #3a3630;"></div>
         <div class="color-swatch" data-bg="#0d1520" data-fg="#c6d8ec" style="background:#0d1520;border:1px solid #3a3630;"></div>
@@ -218,14 +219,14 @@ input[type=range]{flex:1;accent-color:var(--accent);cursor:pointer;}
       <div class="color-pair">
         <div>
           <div class="color-label">배경색</div>
-          <div class="swatch-large" id="bgSwatchWrap" style="background:#f5f0e8;">
-            <input type="color" id="bgColorPicker" value="#f5f0e8">
+          <div class="swatch-large" id="bgSwatchWrap" style="background:#ffffff;">
+            <input type="color" id="bgColorPicker" value="#ffffff">
           </div>
         </div>
         <div>
           <div class="color-label">글자색</div>
-          <div class="swatch-large" id="fgSwatchWrap" style="background:#1a1714;">
-            <input type="color" id="fgColorPicker" value="#1a1714">
+          <div class="swatch-large" id="fgSwatchWrap" style="background:#111111;">
+            <input type="color" id="fgColorPicker" value="#111111">
           </div>
         </div>
       </div>
@@ -279,8 +280,8 @@ let cfg = {
   paraGap:  24,
   padding:  100,
   align:    'left',
-  bg:       '#f5f0e8',
-  fg:       '#1a1714',
+  bg:       '#ffffff',
+  fg:       '#111111',
 };
 
 function getRatioWH(ratio, baseW) {
