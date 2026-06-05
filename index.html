@@ -63,10 +63,41 @@ input[type=range]{flex:1;accent-color:var(--accent);cursor:pointer;}
 .color-label{font-size:11px;color:var(--muted);margin-bottom:5px;}
 .swatch-large{width:100%;height:32px;border-radius:6px;border:1px solid var(--border);cursor:pointer;position:relative;overflow:hidden;}
 .swatch-large input[type=color]{position:absolute;inset:0;width:150%;height:150%;opacity:0;cursor:pointer;}
+/* 캔버스 헤더 (PC에서는 로고 숨김) */
+.canvas-header{display:none;}
+.canvas-divider{height:1px;background:var(--border);margin:4px 0;}
+.canvas-logo{font-family:'Nanum Myeongjo',serif;font-size:14px;color:var(--accent);letter-spacing:0.12em;}
+
 @media(max-width:760px){
-  .app{grid-template-columns:1fr;height:auto;}
-  .sidebar{height:auto;}
-  .main{padding:16px;}
+  html,body{height:100%;overflow:hidden;}
+  .app{
+    display:flex;flex-direction:column;
+    height:100%;padding:8px;gap:8px;
+    overflow:hidden;
+  }
+  /* 미리보기 박스 - 높이 고정, 줄어들지 않음 */
+  .main{
+    order:1;padding:0;
+    flex-shrink:0;
+  }
+  .canvas-wrap{
+    background:var(--panel);border:1px solid var(--border);border-radius:10px;
+    padding:12px;width:100%;max-width:none;
+  }
+  .canvas-header{display:flex;flex-direction:column;gap:6px;margin-bottom:10px;}
+  .canvas-header .canvas-divider{display:none;}/* 구분선 숨김 */
+  .canvas-header .section-label{display:none;}/* 미리보기 글씨 숨김 */
+  .canvas-outer{justify-content:center;}
+  #previewCanvas{width:auto !important;height:48vw !important;max-width:100%;}
+  /* 사이드바 - 남은 공간 차지하며 내부만 스크롤 */
+  .sidebar{
+    order:2;
+    flex:1;overflow-y:auto;
+    background:var(--panel);border:1px solid var(--border);border-radius:10px;
+    padding:16px;border-right:none;
+    margin-bottom:8px;
+  }
+  .sidebar .logo{display:none;}
 }
 </style>
 </head>
@@ -206,7 +237,11 @@ input[type=range]{flex:1;accent-color:var(--accent);cursor:pointer;}
 
   <div class="main">
     <div class="canvas-wrap">
-      <div class="section-label" style="margin-bottom:16px;">미리보기</div>
+      <div class="canvas-header">
+        <div class="canvas-logo">✦ 발췌 생성기</div>
+        <div class="canvas-divider"></div>
+        <div class="section-label" style="margin:0;">미리보기</div>
+      </div>
       <div class="canvas-outer" id="canvasOuter">
         <canvas id="previewCanvas"></canvas>
       </div>
