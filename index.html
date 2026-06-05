@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>✦ 발췌 생성기</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;500&family=Noto+Sans+KR:wght@300;400;500&family=Nanum+Myeongjo:wght@400;700&family=Pretendard:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#1a1714;--panel:#201e1b;--panel2:#252220;--border:#3a3630;
+  --text:#e8e2d9;--muted:#8a8278;--accent:#c9a96e;--accent2:#8b6f47;
+}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-serif;}
+.app{display:grid;grid-template-columns:340px 1fr;height:100vh;}
+.sidebar{background:var(--panel);border-right:1px solid var(--border);padding:20px;overflow-y:auto;display:flex;flex-direction:column;gap:14px;}
+.main{padding:24px;overflow-y:auto;display:flex;flex-direction:column;gap:16px;background:var(--bg);}
+.logo{font-family:'Nanum Myeongjo',serif;font-size:15px;color:var(--accent);letter-spacing:0.12em;padding-bottom:14px;border-bottom:1px solid var(--border);}
+.section-label{font-size:11px;color:var(--muted);letter-spacing:0.1em;margin-bottom:7px;text-transform:uppercase;}
+textarea{width:100%;background:var(--panel2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'Noto Sans KR',sans-serif;font-size:13px;line-height:1.7;padding:12px;resize:vertical;outline:none;min-height:160px;}
+textarea:focus{border-color:var(--accent2);}
+.meta-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+input[type=text]{width:100%;background:var(--panel2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'Noto Sans KR',sans-serif;font-size:13px;padding:8px 10px;outline:none;}
+input[type=text]:focus{border-color:var(--accent2);}
+input[type=text]::placeholder{color:var(--muted);}
+.control-group{display:flex;flex-direction:column;gap:9px;}
+.row{display:flex;align-items:center;gap:10px;}
+.row label{font-size:12px;color:var(--muted);min-width:60px;flex-shrink:0;}
+select{background:var(--panel2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;padding:7px 9px;outline:none;cursor:pointer;width:100%;}
+input[type=range]{flex:1;accent-color:var(--accent);cursor:pointer;}
+.val{font-size:12px;color:var(--accent);min-width:38px;text-align:right;font-variant-numeric:tabular-nums;}
+.color-row{display:flex;gap:7px;flex-wrap:wrap;align-items:center;}
+.color-swatch{width:26px;height:26px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:border-color 0.15s,transform 0.1s;flex-shrink:0;}
+.color-swatch:hover{transform:scale(1.1);}
+.color-swatch.active{border-color:var(--accent);}
+.color-picker-wrap{position:relative;width:26px;height:26px;flex-shrink:0;}
+.color-picker-wrap input[type=color]{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;border:none;padding:0;}
+.color-picker-btn{width:26px;height:26px;border-radius:50%;border:2px dashed var(--muted);display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--muted);pointer-events:none;line-height:1;}
+.ratio-row{display:flex;gap:6px;}
+.ratio-btn{flex:1;padding:7px 4px;background:var(--panel2);border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:12px;cursor:pointer;text-align:center;transition:all 0.15s;}
+.ratio-btn:hover{border-color:var(--accent2);color:var(--text);}
+.ratio-btn.active{background:var(--accent2);color:#fff;border-color:var(--accent2);}
+.seg-row{display:flex;gap:6px;}
+.seg-btn{flex:1;padding:7px 4px;background:var(--panel2);border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:14px;cursor:pointer;text-align:center;transition:all 0.15s;}
+.seg-btn:hover{border-color:var(--accent2);color:var(--text);}
+.seg-btn.active{background:var(--accent2);color:#fff;border-color:var(--accent2);}
+.action-btn{width:100%;padding:10px;border:none;border-radius:7px;font-family:'Noto Sans KR',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all 0.15s;letter-spacing:0.05em;}
+.action-btn.primary{background:var(--accent2);color:#fff;}
+.action-btn.primary:hover{background:var(--accent);}
+.action-btn.secondary{background:transparent;border:1px solid var(--border);color:var(--muted);}
+.action-btn.secondary:hover{border-color:var(--accent2);color:var(--text);}
+.canvas-wrap{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:24px;}
+.canvas-outer{width:100%;display:flex;justify-content:center;}
+#previewCanvas{border-radius:6px;display:block;width:100%;height:auto;}
+.hint-box{background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:11px 13px;}
+.hint-box p{font-size:12px;color:var(--muted);line-height:1.9;}
+.hint-box code{font-size:11px;background:#2a2822;padding:1px 5px;border-radius:3px;color:var(--accent);}
+.divider{height:1px;background:var(--border);}
+.color-pair{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.color-label{font-size:11px;color:var(--muted);margin-bottom:5px;}
+.swatch-large{width:100%;height:32px;border-radius:6px;border:1px solid var(--border);cursor:pointer;position:relative;overflow:hidden;}
+.swatch-large input[type=color]{position:absolute;inset:0;width:150%;height:150%;opacity:0;cursor:pointer;}
+@media(max-width:760px){
+  .app{grid-template-columns:1fr;height:auto;}
+  .sidebar{height:auto;}
+  .main{padding:16px;}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="sidebar">
+    <div class="logo">✦ 발췌 생성기</div>
+
+    <div>
+      <div class="section-label">본문 입력</div>
+      <textarea id="inputText" placeholder="여기에 내용을 붙여넣으세요.
+
+대사나 일반 문장은 그냥 입력.
+
+*지문은 별표 하나로 감싸면*
+기울어진 이탤릭 폰트로 표시됩니다.
+
+단락은 빈 줄로 구분해요."></textarea>
+    </div>
+
+    <div class="hint-box">
+      <p>
+        <code>*지문*</code> → <em style="color:#c9a96e;font-style:italic;">이탤릭 · 연한 색</em><br>
+        <code>"대사"</code> → 따옴표 제거 후 기본 폰트 (굽은따옴표도 OK)<br>
+        문장 중간 혼용도 가능 · 빈 줄로 단락 구분
+      </p>
+    </div>
+
+    <div class="meta-row">
+      <div>
+        <div class="section-label">제작자</div>
+        <input type="text" id="authorInput" placeholder="@username">
+      </div>
+      <div>
+        <div class="section-label">캐릭터/제목</div>
+        <input type="text" id="titleInput" placeholder="작품 · 캐릭터">
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="control-group">
+      <div class="section-label">캔버스 비율</div>
+      <div class="ratio-row">
+        <div class="ratio-btn active" data-ratio="1:1">1:1</div>
+        <div class="ratio-btn" data-ratio="4:5">4:5</div>
+        <div class="ratio-btn" data-ratio="16:9">16:9</div>
+      </div>
+    </div>
+
+    <div class="control-group">
+      <div class="section-label">폰트</div>
+      <select id="fontSelect">
+        <option value="'Nanum Myeongjo', serif">나눔명조</option>
+        <option value="'Noto Serif KR', serif">Noto Serif KR</option>
+        <option value="'Noto Sans KR', sans-serif">Noto Sans KR</option>
+        <option value="'Pretendard', sans-serif">Pretendard</option>
+        <option value="'Gowun Dodum', sans-serif">고운돋움</option>
+        <option value="'Gowun Batang', serif">고운바탕</option>
+        <option value="'Nanum Gothic', sans-serif">나눔고딕</option>
+        <option value="'Do Hyeon', sans-serif">도현</option>
+        <option value="'Black Han Sans', sans-serif">검은고딕</option>
+        <option value="'Gaegu', cursive">개구체</option>
+      </select>
+    </div>
+
+    <div class="control-group">
+      <div class="section-label">텍스트 설정</div>
+      <div class="row">
+        <label>글자 크기</label>
+        <input type="range" id="fontSize" min="20" max="120" value="42" step="1">
+        <span class="val" id="fontSizeVal">42px</span>
+      </div>
+      <div class="row">
+        <label>줄 간격</label>
+        <input type="range" id="lineGap" min="0" max="80" value="20" step="2">
+        <span class="val" id="lineGapVal">1.5x</span>
+      </div>
+      <div class="row">
+        <label>단락 간격</label>
+        <input type="range" id="paraGap" min="0" max="120" value="24" step="4">
+        <span class="val" id="paraGapVal">24px</span>
+      </div>
+      <div class="row">
+        <label>여백</label>
+        <input type="range" id="padding" min="40" max="240" value="100" step="4">
+        <span class="val" id="paddingVal">100px</span>
+      </div>
+    </div>
+
+    <div class="control-group">
+      <div class="section-label">글자 정렬</div>
+      <div class="seg-row">
+        <div class="seg-btn active" data-align="left">←</div>
+        <div class="seg-btn" data-align="center">↔</div>
+        <div class="seg-btn" data-align="right">→</div>
+      </div>
+    </div>
+
+    <div class="control-group">
+      <div class="section-label">배경 프리셋</div>
+      <div class="color-row" id="bgPresets">
+        <div class="color-swatch active" data-bg="#f5f0e8" data-fg="#1a1714" style="background:#f5f0e8;"></div>
+        <div class="color-swatch" data-bg="#faf8f4" data-fg="#1a1714" style="background:#faf8f4;"></div>
+        <div class="color-swatch" data-bg="#1a1714" data-fg="#e8e2d9" style="background:#1a1714;border:1px solid #3a3630;"></div>
+        <div class="color-swatch" data-bg="#0d1520" data-fg="#c6d8ec" style="background:#0d1520;border:1px solid #3a3630;"></div>
+        <div class="color-swatch" data-bg="#18112a" data-fg="#ddd0f4" style="background:#18112a;border:1px solid #3a3630;"></div>
+        <div class="color-swatch" data-bg="#f0ebe2" data-fg="#2a1f14" style="background:#f0ebe2;"></div>
+        <div class="color-swatch" data-bg="#ecf2ec" data-fg="#1a2a1c" style="background:#ecf2ec;"></div>
+        <div class="color-swatch" data-bg="#f5eaee" data-fg="#2a1520" style="background:#f5eaee;"></div>
+      </div>
+    </div>
+
+    <div class="control-group">
+      <div class="section-label">색상 직접 설정</div>
+      <div class="color-pair">
+        <div>
+          <div class="color-label">배경색</div>
+          <div class="swatch-large" id="bgSwatchWrap" style="background:#f5f0e8;">
+            <input type="color" id="bgColorPicker" value="#f5f0e8">
+          </div>
+        </div>
+        <div>
+          <div class="color-label">글자색</div>
+          <div class="swatch-large" id="fgSwatchWrap" style="background:#1a1714;">
+            <input type="color" id="fgColorPicker" value="#1a1714">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <button class="action-btn primary" id="saveBtn">⬇ 이미지 저장 (PNG)</button>
+    <button class="action-btn secondary" id="refreshBtn">↺ 미리보기 갱신</button>
+  </div>
+
+  <div class="main">
+    <div class="canvas-wrap">
+      <div class="section-label" style="margin-bottom:16px;">미리보기</div>
+      <div class="canvas-outer" id="canvasOuter">
+        <canvas id="previewCanvas"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// 추가 구글 폰트 동적 로드
+const extraFonts = [
+  'Gowun+Dodum','Gowun+Batang','Nanum+Gothic','Do+Hyeon','Black+Han+Sans','Gaegu'
+];
+const link = document.createElement('link');
+link.rel = 'stylesheet';
+link.href = `https://fonts.googleapis.com/css2?family=${extraFonts.join('&family=')}&display=swap`;
+document.head.appendChild(link);
+
+const canvas = document.getElementById('previewCanvas');
+const ctx    = canvas.getContext('2d');
+
+// ── 캔버스 내부 해상도 (저장 품질 기준)
+// 미리보기는 이 캔버스를 CSS로 축소해서 표시 → 참고 사이트와 동일한 방식
+// 슬라이더 42px = 저장 이미지에서 42px (인스타 1080px 기준으로 체감 적절)
+const DESIGN_W = 1080;
+
+let cfg = {
+  ratio:    '1:1',
+  font:     "'Nanum Myeongjo', serif",
+  fontSize: 42,
+  lineGap:  20,
+  paraGap:  24,
+  padding:  100,
+  align:    'left',
+  bg:       '#f5f0e8',
+  fg:       '#1a1714',
+};
+
+function getRatioWH(ratio, baseW) {
+  if (ratio === '1:1')  return [baseW, baseW];
+  if (ratio === '4:5')  return [baseW, Math.round(baseW * 5 / 4)];
+  if (ratio === '16:9') return [baseW, Math.round(baseW * 9 / 16)];
+  return [baseW, baseW];
+}
+
+// ── 파싱: *지문* / "대사"(“”포함) 혼용 ──
+// 큰따옴표는 구분자로만 사용, 출력에서 제거
+function parseSegments(line) {
+  const segs = [];
+  const re = /(?<!\*)\*(?!\*)(.*?)(?<!\*)\*(?!\*)|[“"](.*?)[”"]/g;
+  let last = 0, m;
+  while ((m = re.exec(line)) !== null) {
+    if (m.index > last)
+      segs.push({ type: 'dialogue', text: line.slice(last, m.index) });
+    if (m[1] !== undefined) {
+      segs.push({ type: 'didascalia', text: m[1] });
+    } else {
+      segs.push({ type: 'dialogue', text: m[2] });
+    }
+    last = m.index + m[0].length;
+  }
+  if (last < line.length)
+    segs.push({ type: 'dialogue', text: line.slice(last) });
+  return segs.filter(s => s.text.length > 0);
+}
+
+// 글자 단위 줄바꿈 → [{chars:[{ch,type}], totalW}]
+function layoutSegments(segs, maxW, fontSize, font) {
+  const chars = [];
+  for (const seg of segs)
+    for (const ch of seg.text) chars.push({ ch, type: seg.type });
+
+  const lines = [];
+  let cur = [], curW = 0;
+  for (const item of chars) {
+    ctx.font = item.type === 'didascalia'
+      ? `italic ${fontSize}px ${font}` : `${fontSize}px ${font}`;
+    const cw = ctx.measureText(item.ch).width;
+    if (curW + cw > maxW && cur.length > 0) {
+      lines.push({ chars: cur, totalW: curW });
+      cur = [item]; curW = cw;
+    } else { cur.push(item); curW += cw; }
+  }
+  if (cur.length) lines.push({ chars: cur, totalW: curW });
+  return lines;
+}
+
+// ── 색상 ──────────────────────────────────────
+function hexToRgb(hex) {
+  const h = hex.replace('#','');
+  return [parseInt(h.slice(0,2),16), parseInt(h.slice(2,4),16), parseInt(h.slice(4,6),16)];
+}
+function blendHex(c1, c2, t) {
+  const [r1,g1,b1]=hexToRgb(c1), [r2,g2,b2]=hexToRgb(c2);
+  const h = n => Math.round(n).toString(16).padStart(2,'0');
+  return `#${h(r1*(1-t)+r2*t)}${h(g1*(1-t)+g2*t)}${h(b1*(1-t)+b2*t)}`;
+}
+
+// ── 렌더 코어 ─────────────────────────────────
+// 캔버스는 항상 DESIGN_W(1080) 기준으로 그림
+// 미리보기는 CSS width:100%로 축소 표시 → 참고 사이트와 동일한 방식
+// 슬라이더 수치 = 저장 이미지(1080px)에서의 실제 px
+function renderToCtx(targetCtx, targetW, targetH) {
+  const rawText = document.getElementById('inputText').value;
+  const author  = document.getElementById('authorInput').value.trim();
+  const title   = document.getElementById('titleInput').value.trim();
+
+  const pad  = cfg.padding;
+  const fs   = cfg.fontSize;
+  const lh   = fs + cfg.lineGap;
+  const bGap = cfg.paraGap;
+  const maxW = targetW - pad * 2;
+  const align = cfg.align;
+
+  const didColor  = blendHex(cfg.fg, cfg.bg, 0.42);
+  const metaColor = blendHex(cfg.fg, cfg.bg, 0.52);
+
+  targetCtx.fillStyle = cfg.bg;
+  targetCtx.fillRect(0, 0, targetW, targetH);
+
+  const paras = rawText.split(/\n\n+/).map(p => p.trim()).filter(Boolean);
+  const allGroups = [];
+  for (const para of paras) {
+    const group = [];
+    for (const rl of para.split('\n')) {
+      const trimmed = rl.trim(); if (!trimmed) continue;
+      const laid = layoutSegments(parseSegments(trimmed), maxW, fs, cfg.font);
+      for (const l of laid) group.push(l);
+    }
+    if (group.length) allGroups.push(group);
+  }
+
+  let totalH = 0;
+  for (let i=0; i<allGroups.length; i++) {
+    totalH += allGroups[i].length * lh;
+    if (i < allGroups.length-1) totalH += bGap;
+  }
+  const metaH = (author||title) ? Math.round(fs*0.82) + 20 : 0;
+  totalH += metaH;
+
+  let y = Math.round((targetH - totalH) / 2) + fs;
+  if (y < pad) y = pad + fs;
+
+  targetCtx.textBaseline = 'alphabetic';
+
+  for (let gi=0; gi<allGroups.length; gi++) {
+    for (const line of allGroups[gi]) {
+      let x = align==='right'  ? targetW - pad - line.totalW
+             : align==='center' ? Math.round((targetW - line.totalW) / 2)
+             : pad;
+      for (const item of line.chars) {
+        const isDid = item.type === 'didascalia';
+        targetCtx.font      = isDid ? `italic ${fs}px ${cfg.font}` : `${fs}px ${cfg.font}`;
+        targetCtx.fillStyle = isDid ? didColor : cfg.fg;
+        targetCtx.fillText(item.ch, x, y);
+        x += targetCtx.measureText(item.ch).width;
+      }
+      y += lh;
+    }
+    if (gi < allGroups.length-1) y += bGap;
+  }
+
+  if (author || title) {
+    y += 18;
+    const metaFs = Math.round(fs * 0.78);
+    targetCtx.font      = `${metaFs}px ${cfg.font}`;
+    targetCtx.fillStyle = metaColor;
+    const meta = [title, author].filter(Boolean).join('  ·  ');
+    const metaW = targetCtx.measureText(meta).width;
+    let mx = align==='right'  ? targetW-pad-metaW
+           : align==='center' ? Math.round((targetW-metaW)/2)
+           : pad;
+    targetCtx.fillText(meta, mx, y);
+  }
+}
+
+// ── 렌더 & 저장 ───────────────────────────────
+function render() {
+  const [cw, ch] = getRatioWH(cfg.ratio, DESIGN_W);
+  canvas.width  = cw;
+  canvas.height = ch;
+  // CSS로 축소 표시 — 이것이 참고 사이트와 동일한 방식
+  canvas.style.width  = '100%';
+  canvas.style.height = 'auto';
+  canvas.style.aspectRatio = `${cw} / ${ch}`;
+  ctx.setTransform(1,0,0,1,0,0);
+  renderToCtx(ctx, cw, ch);
+}
+
+document.getElementById('saveBtn').addEventListener('click', () => {
+  // 저장은 이미 DESIGN_W(1080) 기준으로 그려진 캔버스를 그대로 출력
+  const a = document.createElement('a');
+  a.href = canvas.toDataURL('image/png');
+  a.download = 'excerpt.png';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+});
+
+// ── 이벤트 ────────────────────────────────────
+document.querySelectorAll('.ratio-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.ratio-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active'); cfg.ratio = btn.dataset.ratio; render();
+  });
+});
+
+document.getElementById('fontSelect').addEventListener('change', e => {
+  cfg.font = e.target.value; render();
+});
+
+document.querySelectorAll('.seg-btn[data-align]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.seg-btn[data-align]').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active'); cfg.align = btn.dataset.align; render();
+  });
+});
+
+[
+  ['fontSize','fontSizeVal', v=>`${v}px`,                v=>{ cfg.fontSize=v; }],
+  ['lineGap', 'lineGapVal',  v=>`${((cfg.fontSize+v)/cfg.fontSize).toFixed(1)}x`, v=>{ cfg.lineGap=v; }],
+  ['paraGap', 'paraGapVal',  v=>`${v}px`,                v=>{ cfg.paraGap=v; }],
+  ['padding', 'paddingVal',  v=>`${v}px`,                v=>{ cfg.padding=v; }],
+].forEach(([id, vid, fmt, setter]) => {
+  const el = document.getElementById(id);
+  const update = () => {
+    const v = parseInt(el.value);
+    setter(v);
+    document.getElementById(vid).textContent = fmt(v);
+    render();
+  };
+  el.addEventListener('input', update);
+  update(); // 초기값 표시
+});
+
+// 프리셋 스워치
+document.querySelectorAll('#bgPresets .color-swatch').forEach(sw => {
+  sw.addEventListener('click', () => {
+    document.querySelectorAll('#bgPresets .color-swatch').forEach(s=>s.classList.remove('active'));
+    sw.classList.add('active');
+    cfg.bg = sw.dataset.bg; cfg.fg = sw.dataset.fg;
+    document.getElementById('bgColorPicker').value = cfg.bg;
+    document.getElementById('fgColorPicker').value = cfg.fg;
+    document.getElementById('bgSwatchWrap').style.background = cfg.bg;
+    document.getElementById('fgSwatchWrap').style.background = cfg.fg;
+    render();
+  });
+});
+
+// 자유 색상 피커
+document.getElementById('bgColorPicker').addEventListener('input', e => {
+  cfg.bg = e.target.value;
+  document.getElementById('bgSwatchWrap').style.background = cfg.bg;
+  document.querySelectorAll('#bgPresets .color-swatch').forEach(s=>s.classList.remove('active'));
+  render();
+});
+document.getElementById('fgColorPicker').addEventListener('input', e => {
+  cfg.fg = e.target.value;
+  document.getElementById('fgSwatchWrap').style.background = cfg.fg;
+  render();
+});
+
+document.getElementById('inputText').addEventListener('input', render);
+document.getElementById('authorInput').addEventListener('input', render);
+document.getElementById('titleInput').addEventListener('input', render);
+document.getElementById('refreshBtn').addEventListener('click', render);
+
+document.fonts.ready.then(render);
+</script>
+</body>
+</html>
