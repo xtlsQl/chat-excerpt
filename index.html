@@ -16,7 +16,8 @@
 html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-serif;}
 .app{display:grid;grid-template-columns:340px 1fr;height:100vh;}
 .sidebar{background:var(--panel);border-right:1px solid var(--border);padding:20px;overflow-y:auto;display:flex;flex-direction:column;gap:14px;}
-.main{padding:24px;overflow-y:auto;display:flex;flex-direction:column;gap:16px;background:var(--bg);}
+.main{padding:24px;overflow-y:auto;display:flex;flex-direction:column;align-items:center;gap:16px;background:var(--bg);}
+.canvas-wrap{width:100%;max-width:600px;}
 .logo{font-family:'Nanum Myeongjo',serif;font-size:15px;color:var(--accent);letter-spacing:0.12em;padding-bottom:14px;border-bottom:1px solid var(--border);}
 .section-label{font-size:11px;color:var(--muted);letter-spacing:0.1em;margin-bottom:7px;text-transform:uppercase;}
 textarea{width:100%;background:var(--panel2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'Noto Sans KR',sans-serif;font-size:13px;line-height:1.7;padding:12px;resize:vertical;outline:none;min-height:160px;}
@@ -395,9 +396,15 @@ function render() {
 }
 
 document.getElementById('saveBtn').addEventListener('click', () => {
-  // 저장은 이미 DESIGN_W(1080) 기준으로 그려진 캔버스를 그대로 출력
+  // 오프스크린 캔버스에 고해상도로 따로 그려서 저장 → 미리보기 캔버스 영향 없음
+  const [cw, ch] = getRatioWH(cfg.ratio, DESIGN_W);
+  const offCanvas = document.createElement('canvas');
+  offCanvas.width  = cw;
+  offCanvas.height = ch;
+  const offCtx = offCanvas.getContext('2d');
+  renderToCtx(offCtx, cw, ch);
   const a = document.createElement('a');
-  a.href = canvas.toDataURL('image/png');
+  a.href = offCanvas.toDataURL('image/png');
   a.download = 'excerpt.png';
   document.body.appendChild(a); a.click(); document.body.removeChild(a);
 });
