@@ -441,16 +441,36 @@ document.getElementById('saveBtn').addEventListener('click', () => {
   offCanvas.height = ch;
   const offCtx = offCanvas.getContext('2d');
   renderToCtx(offCtx, cw, ch);
-
-  // 사파리 포함 전체 대응: 현재 탭에서 이미지 직접 열기
   const dataUrl = offCanvas.toDataURL('image/png');
-  const w = window.open('', '_blank');
-  if (w) {
-    w.location.href = dataUrl;
-  } else {
-    // 팝업 차단 시 현재 탭에서 열기
-    document.location.href = dataUrl;
+
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  if (!isMobile) {
+    // PC: 바로 다운로드
+    const a = document.createElement('a');
+    a.href = dataUrl;
+    a.download = 'excerpt.png';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    return;
   }
+
+  // 모바일(사파리 등): 오버레이로 이미지 표시 → 꾹 눌러 저장
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.85);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:20px;';
+  const img = document.createElement('img');
+  img.src = dataUrl;
+  img.style.cssText = 'max-width:100%;max-height:75vh;border-radius:8px;display:block;';
+  const msg = document.createElement('p');
+  msg.textContent = '이미지를 꾹 눌러 저장하세요';
+  msg.style.cssText = 'color:#fff;font-size:14px;margin:0;opacity:0.8;font-family:"Noto Sans KR",sans-serif;';
+  const closeBtn = document.createElement('button');
+  closeBtn.textContent = '닫기';
+  closeBtn.style.cssText = 'padding:8px 24px;border:1px solid rgba(255,255,255,0.4);background:transparent;color:#fff;border-radius:6px;font-size:13px;cursor:pointer;font-family:"Noto Sans KR",sans-serif;';
+  closeBtn.onclick = () => document.body.removeChild(overlay);
+  overlay.appendChild(img);
+  overlay.appendChild(msg);
+  overlay.appendChild(closeBtn);
+  overlay.addEventListener('click', e => { if(e.target === overlay) document.body.removeChild(overlay); });
+  document.body.appendChild(overlay);
 });
 
 // ── 이벤트 ────────────────────────────────────
