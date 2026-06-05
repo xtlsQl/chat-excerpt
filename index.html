@@ -52,7 +52,9 @@ input[type=range]{flex:1;accent-color:var(--accent);cursor:pointer;}
 .action-btn.primary:hover{background:var(--accent);}
 .action-btn.secondary{background:transparent;border:1px solid var(--border);color:var(--muted);}
 .action-btn.secondary:hover{border-color:var(--accent2);color:var(--text);}
-.canvas-wrap{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:24px;}
+.canvas-btns{display:flex;gap:8px;margin-top:14px;}
+.canvas-btns .action-btn{width:auto;flex:1;}
+
 .canvas-outer{width:100%;display:flex;justify-content:center;}
 #previewCanvas{border-radius:6px;display:block;width:100%;height:auto;}
 .hint-box{background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:11px 13px;}
@@ -231,8 +233,6 @@ input[type=range]{flex:1;accent-color:var(--accent);cursor:pointer;}
 
     <div class="divider"></div>
 
-    <button class="action-btn primary" id="saveBtn">⬇ 이미지 저장 (PNG)</button>
-    <button class="action-btn secondary" id="refreshBtn">↺ 미리보기 갱신</button>
   </div>
 
   <div class="main">
@@ -244,6 +244,10 @@ input[type=range]{flex:1;accent-color:var(--accent);cursor:pointer;}
       </div>
       <div class="canvas-outer" id="canvasOuter">
         <canvas id="previewCanvas"></canvas>
+      </div>
+      <div class="canvas-btns">
+        <button class="action-btn primary" id="saveBtn">⬇ 이미지 저장</button>
+        <button class="action-btn secondary" id="refreshBtn">↺ 갱신</button>
       </div>
     </div>
   </div>
@@ -437,19 +441,15 @@ document.getElementById('saveBtn').addEventListener('click', () => {
   offCanvas.height = ch;
   const offCtx = offCanvas.getContext('2d');
   renderToCtx(offCtx, cw, ch);
-  const dataUrl = offCanvas.toDataURL('image/png');
 
-  // 사파리(iOS) 대응: 새 탭에서 이미지 열기 → 꾹 눌러서 저장 가능
-  const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-  if (isSafari) {
-    const win = window.open();
-    win.document.write(`<img src="${dataUrl}" style="max-width:100%;display:block;margin:auto;">`);
-    win.document.title = 'excerpt.png';
+  // 사파리 포함 전체 대응: 현재 탭에서 이미지 직접 열기
+  const dataUrl = offCanvas.toDataURL('image/png');
+  const w = window.open('', '_blank');
+  if (w) {
+    w.location.href = dataUrl;
   } else {
-    const a = document.createElement('a');
-    a.href = dataUrl;
-    a.download = 'excerpt.png';
-    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    // 팝업 차단 시 현재 탭에서 열기
+    document.location.href = dataUrl;
   }
 });
 
