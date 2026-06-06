@@ -128,7 +128,7 @@ input[type=range]{flex:1;accent-color:var(--accent);cursor:pointer;}
         <code>*지문*</code> → <em style="color:#e8789a;font-style:italic;">이탤릭 · 연한 색</em><br>
         <code>**대사**</code> → <strong style="color:#2d1018;">볼드체</strong><br>
         <code>"대사"</code> → 따옴표 제거 후 기본 폰트 (굽은따옴표도 OK)<br>
-        문장 중간 혼용도 가능 · 빈 줄로 단락 구분
+        빈 줄 → 단락 간격 · <code>/</code> 한 줄 → 페이지 분할 (전체 저장 시)
       </p>
     </div>
 
@@ -204,6 +204,14 @@ input[type=range]{flex:1;accent-color:var(--accent);cursor:pointer;}
     </div>
 
     <div class="control-group">
+      <div class="section-label">줄바꿈 기준</div>
+      <div class="seg-row">
+        <div class="seg-btn active" data-wrap="char">글자</div>
+        <div class="seg-btn" data-wrap="word">단어</div>
+      </div>
+    </div>
+
+    <div class="control-group">
       <div class="section-label">배경 프리셋</div>
       <div class="color-row" id="bgPresets">
         <div class="color-swatch active" data-bg="#ffffff" data-fg="#111111" style="background:#ffffff;border:1px solid #e0d0d5;"></div>
@@ -236,6 +244,27 @@ input[type=range]{flex:1;accent-color:var(--accent);cursor:pointer;}
       </div>
     </div>
 
+    <div class="control-group">
+      <div class="section-label">배경 이미지</div>
+      <div style="display:flex;align-items:center;justify-content:center;">
+        <input type="file" id="bgImgInput" accept="image/*" style="display:none;">
+        <button class="action-btn secondary" id="bgImgAddBtn" style="width:100%;font-size:12px;padding:9px;">＋ 이미지 추가</button>
+      </div>
+      <div id="bgImgControls" style="display:none;flex-direction:column;gap:9px;">
+        <div class="row">
+          <label>불투명도</label>
+          <input type="range" id="bgImgOpacity" min="0" max="100" value="100" step="1">
+          <span class="val" id="bgImgOpacityVal">100%</span>
+        </div>
+        <div class="row">
+          <label>어두움</label>
+          <input type="range" id="bgImgDim" min="0" max="90" value="0" step="5">
+          <span class="val" id="bgImgDimVal">0%</span>
+        </div>
+        <button class="action-btn secondary" id="bgImgRemove" style="font-size:12px;padding:7px;">✕ 이미지 제거</button>
+      </div>
+    </div>
+
     <div class="divider"></div>
 
   </div>
@@ -251,7 +280,8 @@ input[type=range]{flex:1;accent-color:var(--accent);cursor:pointer;}
         <canvas id="previewCanvas"></canvas>
       </div>
       <div class="canvas-btns">
-        <button class="action-btn primary" id="saveBtn">⬇ 이미지 저장</button>
+        <button class="action-btn primary" id="saveBtn">⬇ 저장</button>
+        <button class="action-btn primary" id="saveAllBtn">⬇ 전체 저장</button>
         <button class="action-btn secondary" id="refreshBtn">↺ 갱신</button>
       </div>
     </div>
@@ -284,8 +314,12 @@ let cfg = {
   paraGap:  24,
   padding:  100,
   align:    'left',
+  wrapMode: 'char',
   bg:       '#ffffff',
   fg:       '#111111',
+  bgImg:        null,
+  bgImgOpacity: 1,
+  bgImgDim:     0,
 };
 
 function getRatioWH(ratio, baseW) {
@@ -318,28 +352,89 @@ function parseSegments(line) {
   return segs.filter(s => s.text.length > 0);
 }
 
-// 글자 단위 줄바꿈 → [{chars:[{ch,type}], totalW}]
-function layoutSegments(segs, maxW, fontSize, font) {
-  const chars = [];
-  for (const seg of segs)
-    for (const ch of seg.text) chars.push({ ch, type: seg.type });
-
-  const lines = [];
-  let cur = [], curW = 0;
-  for (const item of chars) {
-    ctx.font = item.type === 'didascalia'
-      ? `italic ${fontSize}px ${font}`
-      : item.type === 'bold'
-      ? `bold ${fontSize}px ${font}`
-      : `${fontSize}px ${font}`;
-    const cw = ctx.measureText(item.ch).width;
-    if (curW + cw > maxW && cur.length > 0) {
-      lines.push({ chars: cur, totalW: curW });
-      cur = [item]; curW = cw;
-    } else { cur.push(item); curW += cw; }
+// 줄바꿈 → [{chars:[{ch,type}], totalW}]
+// mode: 'char'(글자 단위) | 'word'(단어 단위)
+function layoutSegments(segs, maxW, fontSize, font, mode) {
+  // 공통: 폰트별 너비 측정 헬퍼
+  function cw(ch, type) {
+    ctx.font = type === 'didascalia' ? `italic ${fontSize}px ${font}`
+             : type === 'bold'      ? `bold ${fontSize}px ${font}`
+             : `${fontSize}px ${font}`;
+    return ctx.measureText(ch).width;
   }
-  if (cur.length) lines.push({ chars: cur, totalW: curW });
-  return lines;
+
+  if (mode === 'word') {
+    // ── 단어 단위 줄바꿈 ──
+    // 먼저 세그먼트를 "토큰"(단어/공백) 단위로 쪼갬
+    const tokens = [];
+    for (const seg of segs) {
+      // 공백 기준으로 split하되 공백 자체도 토큰으로 유지
+      const parts = seg.text.split(/(\s+)/);
+      for (const p of parts) {
+        if (p.length === 0) continue;
+        tokens.push({ text: p, type: seg.type });
+      }
+    }
+
+    const lines = [];
+    let cur = [], curW = 0;
+
+    for (const tok of tokens) {
+      // 토큰 전체 너비 계산
+      let tokW = 0;
+      for (const ch of tok.text) tokW += cw(ch, tok.type);
+
+      const isSpace = /^\s+$/.test(tok.text);
+
+      if (curW + tokW > maxW && cur.length > 0) {
+        // 줄바꿈 — 뒤따르는 공백 토큰이면 그냥 버리고 다음 줄로
+        if (!isSpace) {
+          // 단어 자체가 maxW보다 길면 글자 단위로 강제 분할
+          if (tokW > maxW) {
+            lines.push({ chars: cur, totalW: curW });
+            cur = []; curW = 0;
+            for (const ch of tok.text) {
+              const w = cw(ch, tok.type);
+              if (curW + w > maxW && cur.length > 0) {
+                lines.push({ chars: cur, totalW: curW });
+                cur = []; curW = 0;
+              }
+              cur.push({ ch, type: tok.type }); curW += w;
+            }
+          } else {
+            lines.push({ chars: cur, totalW: curW });
+            const chars = tok.text.split('').map(ch => ({ ch, type: tok.type }));
+            cur = chars; curW = tokW;
+          }
+        }
+        // 공백이면 버림(줄 앞 공백 제거)
+      } else {
+        if (isSpace && cur.length === 0) continue; // 줄 맨 앞 공백 스킵
+        const chars = tok.text.split('').map(ch => ({ ch, type: tok.type }));
+        cur.push(...chars); curW += tokW;
+      }
+    }
+    if (cur.length) lines.push({ chars: cur, totalW: curW });
+    return lines;
+
+  } else {
+    // ── 글자 단위 줄바꿈 (기존) ──
+    const chars = [];
+    for (const seg of segs)
+      for (const ch of seg.text) chars.push({ ch, type: seg.type });
+
+    const lines = [];
+    let cur = [], curW = 0;
+    for (const item of chars) {
+      const w = cw(item.ch, item.type);
+      if (curW + w > maxW && cur.length > 0) {
+        lines.push({ chars: cur, totalW: curW });
+        cur = [item]; curW = w;
+      } else { cur.push(item); curW += w; }
+    }
+    if (cur.length) lines.push({ chars: cur, totalW: curW });
+    return lines;
+  }
 }
 
 // ── 색상 ──────────────────────────────────────
@@ -374,23 +469,53 @@ function renderToCtx(targetCtx, targetW, targetH) {
 
   targetCtx.fillStyle = cfg.bg;
   targetCtx.fillRect(0, 0, targetW, targetH);
-
-  const paras = rawText.split(/\n\n+/).map(p => p.trim()).filter(Boolean);
-  const allGroups = [];
-  for (const para of paras) {
-    const group = [];
-    for (const rl of para.split('\n')) {
-      const trimmed = rl.trim(); if (!trimmed) continue;
-      const laid = layoutSegments(parseSegments(trimmed), maxW, fs, cfg.font);
-      for (const l of laid) group.push(l);
+  if (cfg.bgImg) {
+    targetCtx.save();
+    targetCtx.globalAlpha = cfg.bgImgOpacity;
+    const _iw = cfg.bgImg.naturalWidth, _ih = cfg.bgImg.naturalHeight;
+    const _sc = Math.max(targetW / _iw, targetH / _ih);
+    const _dw = _iw * _sc, _dh = _ih * _sc;
+    targetCtx.drawImage(cfg.bgImg, (targetW-_dw)/2, (targetH-_dh)/2, _dw, _dh);
+    targetCtx.restore();
+    if (cfg.bgImgDim > 0) {
+      targetCtx.fillStyle = 'rgba(0,0,0,' + cfg.bgImgDim + ')';
+      targetCtx.fillRect(0, 0, targetW, targetH);
     }
-    if (group.length) allGroups.push(group);
   }
 
+  // 줄 단위로 파싱: 빈 줄 = 단락 간격, / 단독 줄 = 페이지 구분 표시
+  const lines = rawText.split('\n');
+  const allGroups = [];
+  let curGroup = [];
+  let pendingGap = false;
+  for (const rl of lines) {
+    const trimmed = rl.trim();
+    if (trimmed === '/') {
+      // 페이지 구분자 — 구분선 마커 추가
+      if (curGroup.length) allGroups.push(curGroup);
+      allGroups.push([{ __divider: true }]);
+      curGroup = []; pendingGap = false;
+    } else if (trimmed === '') {
+      pendingGap = true;
+    } else {
+      if (pendingGap && curGroup.length) {
+        // 빈 줄 = 단락 간격 마커
+        curGroup.push({ __gap: true });
+        pendingGap = false;
+      }
+      const laid = layoutSegments(parseSegments(trimmed), maxW, fs, cfg.font, cfg.wrapMode);
+      for (const l of laid) curGroup.push(l);
+    }
+  }
+  if (curGroup.length) allGroups.push(curGroup);
+
   let totalH = 0;
-  for (let i=0; i<allGroups.length; i++) {
-    totalH += allGroups[i].length * lh;
-    if (i < allGroups.length-1) totalH += bGap;
+  for (const group of allGroups) {
+    for (const line of group) {
+      if (line.__divider) totalH += lh; // 구분선 높이
+      else if (line.__gap) totalH += bGap;
+      else totalH += lh;
+    }
   }
   const metaH = (author||title) ? Math.round(fs*0.82) + 48 : 0;
   totalH += metaH;
@@ -400,22 +525,38 @@ function renderToCtx(targetCtx, targetW, targetH) {
 
   targetCtx.textBaseline = 'alphabetic';
 
-  for (let gi=0; gi<allGroups.length; gi++) {
-    for (const line of allGroups[gi]) {
-      let x = align==='right'  ? targetW - pad - line.totalW
-             : align==='center' ? Math.round((targetW - line.totalW) / 2)
-             : pad;
-      for (const item of line.chars) {
-        const isDid = item.type === 'didascalia';
-        const isBold = item.type === 'bold';
-        targetCtx.font      = isDid ? `italic ${fs}px ${cfg.font}` : isBold ? `bold ${fs}px ${cfg.font}` : `${fs}px ${cfg.font}`;
-        targetCtx.fillStyle = isDid ? didColor : cfg.fg;
-        targetCtx.fillText(item.ch, x, y);
-        x += targetCtx.measureText(item.ch).width;
+  for (const group of allGroups) {
+    for (const line of group) {
+      if (line.__divider) {
+        // 페이지 구분선: 연한 점선
+        const divY = Math.round(y - fs * 0.3);
+        targetCtx.save();
+        targetCtx.setLineDash([6, 8]);
+        targetCtx.strokeStyle = blendHex(cfg.fg, cfg.bg, 0.75);
+        targetCtx.lineWidth = 1;
+        targetCtx.beginPath();
+        targetCtx.moveTo(pad, divY);
+        targetCtx.lineTo(targetW - pad, divY);
+        targetCtx.stroke();
+        targetCtx.restore();
+        y += lh;
+      } else if (line.__gap) {
+        y += bGap;
+      } else {
+        let x = align==='right'  ? targetW - pad - line.totalW
+               : align==='center' ? Math.round((targetW - line.totalW) / 2)
+               : pad;
+        for (const item of line.chars) {
+          const isDid = item.type === 'didascalia';
+          const isBold = item.type === 'bold';
+          targetCtx.font      = isDid ? `italic ${fs}px ${cfg.font}` : isBold ? `bold ${fs}px ${cfg.font}` : `${fs}px ${cfg.font}`;
+          targetCtx.fillStyle = isDid ? didColor : cfg.fg;
+          targetCtx.fillText(item.ch, x, y);
+          x += targetCtx.measureText(item.ch).width;
+        }
+        y += lh;
       }
-      y += lh;
     }
-    if (gi < allGroups.length-1) y += bGap;
   }
 
   if (author || title) {
@@ -484,7 +625,136 @@ document.getElementById('saveBtn').addEventListener('click', () => {
   document.body.appendChild(overlay);
 });
 
-// ── 이벤트 ────────────────────────────────────
+// 단락 하나만 렌더 (전체 저장용)
+function renderSinglePara(targetCtx, targetW, targetH, paraText) {
+  const author  = document.getElementById('authorInput').value.trim();
+  const title   = document.getElementById('titleInput').value.trim();
+  const pad  = cfg.padding;
+  const fs   = cfg.fontSize;
+  const lh   = fs + cfg.lineGap;
+  const maxW = targetW - pad * 2;
+  const align = cfg.align;
+  const didColor  = blendHex(cfg.fg, cfg.bg, 0.42);
+  const metaColor = blendHex(cfg.fg, cfg.bg, 0.52);
+
+  targetCtx.fillStyle = cfg.bg;
+  targetCtx.fillRect(0, 0, targetW, targetH);
+  if (cfg.bgImg) {
+    targetCtx.save();
+    targetCtx.globalAlpha = cfg.bgImgOpacity;
+    const _iw = cfg.bgImg.naturalWidth, _ih = cfg.bgImg.naturalHeight;
+    const _sc = Math.max(targetW / _iw, targetH / _ih);
+    const _dw = _iw * _sc, _dh = _ih * _sc;
+    targetCtx.drawImage(cfg.bgImg, (targetW-_dw)/2, (targetH-_dh)/2, _dw, _dh);
+    targetCtx.restore();
+    if (cfg.bgImgDim > 0) {
+      targetCtx.fillStyle = 'rgba(0,0,0,' + cfg.bgImgDim + ')';
+      targetCtx.fillRect(0, 0, targetW, targetH);
+    }
+  }
+
+  const group = [];
+  let pendingGap = false;
+  for (const rl of paraText.split('\n')) {
+    const trimmed = rl.trim();
+    if (trimmed === '') { pendingGap = true; continue; }
+    if (pendingGap && group.length) { group.push({ __gap: true }); pendingGap = false; }
+    const laid = layoutSegments(parseSegments(trimmed), maxW, fs, cfg.font, cfg.wrapMode);
+    for (const l of laid) group.push(l);
+  }
+
+  const metaH = (author||title) ? Math.round(fs*0.82) + 48 : 0;
+  let totalH = 0;
+  for (const line of group) totalH += line.__gap ? cfg.paraGap : lh;
+  totalH += metaH;
+
+  let y = Math.round((targetH - totalH) / 2) + fs;
+  if (y < pad) y = pad + fs;
+
+  for (const line of group) {
+    if (line.__gap) { y += cfg.paraGap; continue; }
+    let x;
+    if (align === 'center') x = Math.round((targetW - line.totalW) / 2);
+    else if (align === 'right') x = targetW - pad - line.totalW;
+    else x = pad;
+    for (const item of line.chars) {
+      const isDid = item.type === 'didascalia';
+      const isBold = item.type === 'bold';
+      targetCtx.font      = isDid ? `italic ${fs}px ${cfg.font}` : isBold ? `bold ${fs}px ${cfg.font}` : `${fs}px ${cfg.font}`;
+      targetCtx.fillStyle = isDid ? didColor : cfg.fg;
+      targetCtx.fillText(item.ch, x, y);
+      x += targetCtx.measureText(item.ch).width;
+    }
+    y += lh;
+  }
+
+  if (author || title) {
+    y += 48;
+    const metaFs = Math.round(fs * 0.78);
+    targetCtx.font      = `${metaFs}px ${cfg.font}`;
+    targetCtx.fillStyle = metaColor;
+    const metaStr = [title, author].filter(Boolean).join(' · ');
+    const metaW   = targetCtx.measureText(metaStr).width;
+    let mx;
+    if (align === 'center') mx = Math.round((targetW - metaW) / 2);
+    else if (align === 'right') mx = targetW - pad - metaW;
+    else mx = pad;
+    targetCtx.fillText(metaStr, mx, y);
+  }
+}
+
+// 모바일 오버레이로 이미지 표시 (공통 헬퍼)
+function showMobileOverlay(dataUrls) {
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.85);display:flex;flex-direction:column;align-items:center;overflow-y:auto;gap:16px;padding:20px;';
+  const msg = document.createElement('p');
+  msg.textContent = `이미지를 꾹 눌러 저장하세요 (총 ${dataUrls.length}장)`;
+  msg.style.cssText = 'color:#fff;font-size:14px;margin:0;opacity:0.8;font-family:"Noto Sans KR",sans-serif;flex-shrink:0;';
+  overlay.appendChild(msg);
+  for (const url of dataUrls) {
+    const img = document.createElement('img');
+    img.src = url;
+    img.style.cssText = 'max-width:100%;border-radius:8px;display:block;flex-shrink:0;';
+    overlay.appendChild(img);
+  }
+  const closeBtn = document.createElement('button');
+  closeBtn.textContent = '닫기';
+  closeBtn.style.cssText = 'padding:8px 24px;border:1px solid rgba(255,255,255,0.4);background:transparent;color:#fff;border-radius:6px;font-size:13px;cursor:pointer;font-family:"Noto Sans KR",sans-serif;flex-shrink:0;';
+  closeBtn.onclick = () => document.body.removeChild(overlay);
+  overlay.appendChild(closeBtn);
+  overlay.addEventListener('click', e => { if(e.target === overlay) document.body.removeChild(overlay); });
+  document.body.appendChild(overlay);
+}
+
+document.getElementById('saveAllBtn').addEventListener('click', () => {
+  const rawText = document.getElementById('inputText').value;
+  const paras = rawText.split(/\n[ \t]*\/[ \t]*\n|\n[ \t]*\/[ \t]*$|^[ \t]*\/[ \t]*\n/m)
+    .map(p => p.trim()).filter(Boolean);
+  if (paras.length === 0) return;
+
+  const [cw, ch] = getRatioWH(cfg.ratio, DESIGN_W);
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  const dataUrls = [];
+
+  for (const para of paras) {
+    const off = document.createElement('canvas');
+    off.width = cw; off.height = ch;
+    renderSinglePara(off.getContext('2d'), cw, ch, para);
+    dataUrls.push(off.toDataURL('image/png'));
+  }
+
+  if (!isMobile) {
+    // PC: 순차 다운로드
+    dataUrls.forEach((url, i) => {
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `excerpt_${String(i+1).padStart(2,'0')}.png`;
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    });
+  } else {
+    showMobileOverlay(dataUrls);
+  }
+});
 document.querySelectorAll('.ratio-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.ratio-btn').forEach(b=>b.classList.remove('active'));
@@ -500,6 +770,13 @@ document.querySelectorAll('.seg-btn[data-align]').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.seg-btn[data-align]').forEach(b=>b.classList.remove('active'));
     btn.classList.add('active'); cfg.align = btn.dataset.align; render();
+  });
+});
+
+document.querySelectorAll('.seg-btn[data-wrap]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.seg-btn[data-wrap]').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active'); cfg.wrapMode = btn.dataset.wrap; render();
   });
 });
 
@@ -551,6 +828,50 @@ document.getElementById('inputText').addEventListener('input', render);
 document.getElementById('authorInput').addEventListener('input', render);
 document.getElementById('titleInput').addEventListener('input', render);
 document.getElementById('refreshBtn').addEventListener('click', render);
+
+
+// ── 배경 이미지 ───────────────────────────────
+document.getElementById('bgImgAddBtn').addEventListener('click', () => {
+  document.getElementById('bgImgInput').click();
+});
+document.getElementById('bgImgInput').addEventListener('change', e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const img = new Image();
+    img.onload = () => {
+      cfg.bgImg = img;
+      document.getElementById('bgImgControls').style.display = 'flex';
+      const name = file.name;
+      document.getElementById('bgImgAddBtn').textContent = '🖼 ' + (name.length > 18 ? name.slice(0,18)+'…' : name);
+      render();
+    };
+    img.src = ev.target.result;
+  };
+  reader.readAsDataURL(file);
+});
+document.getElementById('bgImgOpacity').addEventListener('input', e => {
+  cfg.bgImgOpacity = parseInt(e.target.value) / 100;
+  document.getElementById('bgImgOpacityVal').textContent = e.target.value + '%';
+  render();
+});
+document.getElementById('bgImgDim').addEventListener('input', e => {
+  cfg.bgImgDim = parseInt(e.target.value) / 100;
+  document.getElementById('bgImgDimVal').textContent = e.target.value + '%';
+  render();
+});
+document.getElementById('bgImgRemove').addEventListener('click', () => {
+  cfg.bgImg = null; cfg.bgImgOpacity = 1; cfg.bgImgDim = 0;
+  document.getElementById('bgImgInput').value = '';
+  document.getElementById('bgImgAddBtn').textContent = '＋ 이미지 추가';
+  document.getElementById('bgImgControls').style.display = 'none';
+  document.getElementById('bgImgOpacity').value = 100;
+  document.getElementById('bgImgDim').value = 0;
+  document.getElementById('bgImgOpacityVal').textContent = '100%';
+  document.getElementById('bgImgDimVal').textContent = '0%';
+  render();
+});
 
 document.fonts.ready.then(render);
 </script>
