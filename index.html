@@ -212,6 +212,14 @@ input[type=range]{flex:1;accent-color:var(--accent);cursor:pointer;}
     </div>
 
     <div class="control-group">
+      <div class="section-label">글씨 그림자</div>
+      <div class="seg-row">
+        <div class="seg-btn active" data-shadow="off">OFF</div>
+        <div class="seg-btn" data-shadow="on">ON</div>
+      </div>
+    </div>
+
+    <div class="control-group">
       <div class="section-label">배경 프리셋</div>
       <div class="color-row" id="bgPresets">
         <div class="color-swatch active" data-bg="#ffffff" data-fg="#111111" style="background:#ffffff;border:1px solid #e0d0d5;"></div>
@@ -315,6 +323,7 @@ let cfg = {
   padding:  100,
   align:    'left',
   wrapMode: 'char',
+  textShadow: false,
   bg:       '#ffffff',
   fg:       '#111111',
   bgImg:        null,
@@ -524,6 +533,7 @@ function renderToCtx(targetCtx, targetW, targetH) {
   if (y < pad) y = pad + fs;
 
   targetCtx.textBaseline = 'alphabetic';
+  if (cfg.textShadow) { targetCtx.shadowColor='rgba(0,0,0,0.18)'; targetCtx.shadowBlur=6; targetCtx.shadowOffsetX=1; targetCtx.shadowOffsetY=1; }
 
   for (const group of allGroups) {
     for (const line of group) {
@@ -558,6 +568,7 @@ function renderToCtx(targetCtx, targetW, targetH) {
       }
     }
   }
+  targetCtx.shadowColor='transparent'; targetCtx.shadowBlur=0; targetCtx.shadowOffsetX=0; targetCtx.shadowOffsetY=0;
 
   if (author || title) {
     y += 48;
@@ -671,6 +682,7 @@ function renderSinglePara(targetCtx, targetW, targetH, paraText) {
   let y = Math.round((targetH - totalH) / 2) + fs;
   if (y < pad) y = pad + fs;
 
+  if (cfg.textShadow) { targetCtx.shadowColor='rgba(0,0,0,0.18)'; targetCtx.shadowBlur=6; targetCtx.shadowOffsetX=1; targetCtx.shadowOffsetY=1; }
   for (const line of group) {
     if (line.__gap) { y += cfg.paraGap; continue; }
     let x;
@@ -687,6 +699,7 @@ function renderSinglePara(targetCtx, targetW, targetH, paraText) {
     }
     y += lh;
   }
+  targetCtx.shadowColor='transparent'; targetCtx.shadowBlur=0; targetCtx.shadowOffsetX=0; targetCtx.shadowOffsetY=0;
 
   if (author || title) {
     y += 48;
@@ -871,6 +884,13 @@ document.getElementById('bgImgRemove').addEventListener('click', () => {
   document.getElementById('bgImgOpacityVal').textContent = '100%';
   document.getElementById('bgImgDimVal').textContent = '0%';
   render();
+});
+
+document.querySelectorAll('.seg-btn[data-shadow]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.seg-btn[data-shadow]').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active'); cfg.textShadow = btn.dataset.shadow === 'on'; render();
+  });
 });
 
 document.fonts.ready.then(render);
