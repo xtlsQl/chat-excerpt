@@ -13,12 +13,17 @@
   --bg:#fff5f7;--panel:#ffffff;--panel2:#fff0f3;--border:#f5c9d6;
   --text:#2d1018;--muted:#b06070;--accent:#e8789a;--accent2:#c94f72;
 }
+body.dark{
+  --bg:#1a0d10;--panel:#261318;--panel2:#2e161b;--border:#4a2530;
+  --text:#f5dde3;--muted:#c47a8a;--accent:#e8789a;--accent2:#e8789a;
+}
 html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-serif;}
 .app{display:grid;grid-template-columns:340px 1fr;height:100vh;}
 .sidebar{background:var(--panel);border-right:1px solid var(--border);padding:20px;overflow-y:auto;display:flex;flex-direction:column;gap:14px;}
 .main{padding:24px;overflow-y:auto;display:flex;flex-direction:column;align-items:center;gap:16px;background:var(--bg);}
 .canvas-wrap{width:100%;max-width:600px;}
-.logo{font-family:'Nanum Myeongjo',serif;font-size:15px;color:var(--accent2);letter-spacing:0.12em;padding-bottom:14px;border-bottom:1px solid var(--border);}
+.logo{font-family:'Nanum Myeongjo',serif;font-size:15px;color:var(--accent2);letter-spacing:0.12em;padding-bottom:14px;border-bottom:1px solid var(--border);display:flex;align-items:baseline;justify-content:space-between;}
+.logo-date{font-family:'Noto Sans KR',sans-serif;font-size:10px;color:var(--muted);letter-spacing:0.05em;font-weight:400;}
 .section-label{font-size:11px;color:var(--muted);letter-spacing:0.1em;margin-bottom:7px;text-transform:uppercase;}
 textarea{width:100%;background:var(--panel2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'Noto Sans KR',sans-serif;font-size:13px;line-height:1.7;padding:12px;resize:vertical;outline:none;min-height:160px;}
 textarea:focus{border-color:var(--accent2);}
@@ -39,14 +44,18 @@ input[type=range]{flex:1;accent-color:var(--accent);cursor:pointer;}
 .color-picker-wrap{position:relative;width:26px;height:26px;flex-shrink:0;}
 .color-picker-wrap input[type=color]{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;border:none;padding:0;}
 .color-picker-btn{width:26px;height:26px;border-radius:50%;border:2px dashed var(--muted);display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--muted);pointer-events:none;line-height:1;}
-.ratio-row{display:flex;gap:6px;}
-.ratio-btn{flex:1;padding:7px 4px;background:var(--panel2);border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:12px;cursor:pointer;text-align:center;transition:all 0.15s;}
-.ratio-btn:hover{border-color:var(--accent2);color:var(--text);}
-.ratio-btn.active{background:var(--accent2);color:#fff;border-color:var(--accent2);}
-.seg-row{display:flex;gap:6px;}
-.seg-btn{flex:1;padding:7px 4px;background:var(--panel2);border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:14px;cursor:pointer;text-align:center;transition:all 0.15s;}
-.seg-btn:hover{border-color:var(--accent2);color:var(--text);}
-.seg-btn.active{background:var(--accent2);color:#fff;border-color:var(--accent2);}
+.ratio-row{display:flex;gap:0;}
+.ratio-btn{flex:1;padding:9px 4px;background:var(--panel2);border:1px solid var(--border);border-right:none;color:var(--muted);font-size:12px;cursor:pointer;text-align:center;transition:all 0.15s;font-family:'Noto Sans KR',sans-serif;}
+.ratio-btn:first-child{border-radius:7px 0 0 7px;}
+.ratio-btn:last-child{border-radius:0 7px 7px 0;border-right:1px solid var(--border);}
+.ratio-btn:hover{background:var(--panel);color:var(--text);}
+.ratio-btn.active{background:var(--accent2);color:#fff;border-color:var(--accent2);z-index:1;position:relative;}
+.seg-row{display:flex;gap:0;}
+.seg-btn{flex:1;padding:9px 4px;background:var(--panel2);border:1px solid var(--border);border-right:none;color:var(--muted);font-size:13px;cursor:pointer;text-align:center;transition:all 0.15s;font-family:'Noto Sans KR',sans-serif;}
+.seg-btn:first-child{border-radius:7px 0 0 7px;}
+.seg-btn:last-child{border-radius:0 7px 7px 0;border-right:1px solid var(--border);}
+.seg-btn:hover{background:var(--panel);color:var(--text);}
+.seg-btn.active{background:var(--accent2);color:#fff;border-color:var(--accent2);z-index:1;position:relative;}
 .action-btn{width:100%;padding:10px;border:none;border-radius:7px;font-family:'Noto Sans KR',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all 0.15s;letter-spacing:0.05em;}
 .action-btn.primary{background:var(--accent2);color:#fff;}
 .action-btn.primary:hover{background:var(--accent);}
@@ -57,9 +66,6 @@ input[type=range]{flex:1;accent-color:var(--accent);cursor:pointer;}
 
 .canvas-outer{width:100%;display:flex;justify-content:center;}
 #previewCanvas{border-radius:6px;display:block;width:100%;height:auto;box-shadow:0 0 0 1px #f5c9d6,0 2px 12px rgba(201,79,114,0.08);}
-.hint-box{background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:11px 13px;}
-.hint-box p{font-size:12px;color:var(--muted);line-height:1.9;}
-.hint-box code{font-size:11px;background:#ffd6e3;padding:1px 5px;border-radius:3px;color:var(--accent2);}
 .divider{height:1px;background:var(--border);}
 .color-pair{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
 .color-label{font-size:11px;color:var(--muted);margin-bottom:5px;}
@@ -68,7 +74,7 @@ input[type=range]{flex:1;accent-color:var(--accent);cursor:pointer;}
 /* 캔버스 헤더 (PC에서는 로고 숨김) */
 .canvas-header{display:none;}
 .canvas-divider{height:1px;background:var(--border);margin:4px 0;}
-.canvas-logo{font-family:'Nanum Myeongjo',serif;font-size:14px;color:var(--accent2);letter-spacing:0.12em;}
+.canvas-logo{font-family:'Nanum Myeongjo',serif;font-size:14px;color:var(--accent2);letter-spacing:0.12em;display:flex;align-items:baseline;justify-content:space-between;}
 
 @media(max-width:760px){
   html,body{height:100%;overflow:hidden;}
@@ -101,35 +107,67 @@ input[type=range]{flex:1;accent-color:var(--accent);cursor:pointer;}
   }
   .sidebar .logo{display:none;}
 }
+
+/* ── 커스텀 모달 (사파리 iframe confirm/prompt 대체) ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(45,16,24,0.45);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;}
+.modal-box{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:22px 20px 18px;width:100%;max-width:300px;box-shadow:0 8px 32px rgba(201,79,114,0.18);display:flex;flex-direction:column;gap:14px;}
+.modal-msg{font-size:13px;color:var(--text);line-height:1.6;text-align:center;}
+.modal-input{width:100%;background:var(--panel2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'Noto Sans KR',sans-serif;font-size:13px;padding:8px 10px;outline:none;}
+.modal-input:focus{border-color:var(--accent2);}
+.modal-btns{display:flex;gap:8px;}
+.modal-btns button{flex:1;padding:9px;border-radius:7px;font-family:'Noto Sans KR',sans-serif;font-size:13px;font-weight:500;cursor:pointer;border:none;transition:all 0.15s;}
+.modal-ok{background:var(--accent2);color:#fff;}
+.modal-ok:hover{background:var(--accent);}
+.modal-cancel{background:transparent;border:1px solid var(--border) !important;color:var(--muted);}
+.modal-cancel:hover{border-color:var(--accent2) !important;color:var(--text);}
+
+/* ── 포토샵 스타일 컬러 피커 모달 ── */
+.cp-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(20,8,14,0.6);z-index:10000;display:-webkit-flex;display:flex;-webkit-align-items:center;align-items:center;-webkit-justify-content:center;justify-content:center;padding:10px;-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);}
+.cp-box{background:#3c3c3c;border:1px solid #555;border-radius:4px;padding:12px;width:100%;max-width:400px;-webkit-box-shadow:0 8px 40px rgba(0,0,0,0.7);box-shadow:0 8px 40px rgba(0,0,0,0.7);display:-webkit-flex;display:flex;-webkit-flex-direction:column;flex-direction:column;gap:10px;font-family:'Noto Sans KR',sans-serif;}
+.cp-title{font-size:11px;color:#ccc;letter-spacing:0.06em;}
+.cp-body{display:-webkit-flex;display:flex;gap:8px;-webkit-align-items:flex-start;align-items:flex-start;}
+.cp-sb-wrap{position:relative;-webkit-flex:1;flex:1;height:170px;border-radius:2px;cursor:crosshair;border:1px solid #222;min-width:0;overflow:hidden;}
+.cp-sb-canvas{width:100%;height:100%;display:block;}
+.cp-sb-cursor{position:absolute;width:12px;height:12px;border-radius:50%;border:2px solid #fff;-webkit-box-shadow:0 0 0 1px #000;box-shadow:0 0 0 1px #000;-webkit-transform:translate(-50%,-50%);transform:translate(-50%,-50%);pointer-events:none;top:0;left:0;}
+.cp-h-wrap{position:relative;width:16px;height:170px;-webkit-flex-shrink:0;flex-shrink:0;}
+.cp-h-canvas{width:100%;height:100%;display:block;border:1px solid #222;}
+.cp-h-cursor{position:absolute;left:-3px;right:-3px;height:4px;background:transparent;border:2px solid #fff;-webkit-box-shadow:0 0 0 1px #000;box-shadow:0 0 0 1px #000;-webkit-transform:translateY(-50%);transform:translateY(-50%);pointer-events:none;border-radius:1px;}
+.cp-right{display:-webkit-flex;display:flex;-webkit-flex-direction:column;flex-direction:column;gap:5px;width:86px;-webkit-flex-shrink:0;flex-shrink:0;}
+.cp-preview-row{display:-webkit-flex;display:flex;gap:4px;height:28px;}
+.cp-swatch-new,.cp-swatch-cur{-webkit-flex:1;flex:1;border-radius:3px;border:1px solid #555;}
+.cp-swatch-label{font-size:9px;color:#aaa;text-align:center;margin-top:1px;}
+.cp-fields{display:-webkit-flex;display:flex;-webkit-flex-direction:column;flex-direction:column;gap:3px;}
+.cp-field-row{display:-webkit-flex;display:flex;-webkit-align-items:center;align-items:center;gap:3px;}
+.cp-field-label{font-size:10px;color:#bbb;min-width:14px;text-align:right;}
+.cp-field-input{background:#1e1e1e;border:1px solid #555;color:#ddd;font-size:11px;padding:2px 3px;border-radius:2px;width:40px;outline:none;font-family:'Noto Sans KR',sans-serif;text-align:center;-webkit-appearance:none;-moz-appearance:textfield;}
+.cp-field-input:focus{border-color:#e8789a;}
+.cp-hex-row{display:-webkit-flex;display:flex;-webkit-align-items:center;align-items:center;gap:3px;margin-top:2px;}
+.cp-hex-label{font-size:10px;color:#bbb;}
+.cp-hex-input{background:#1e1e1e;border:1px solid #555;color:#ddd;font-size:11px;padding:2px 4px;border-radius:2px;width:60px;outline:none;font-family:monospace;text-transform:uppercase;-webkit-appearance:none;}
+.cp-hex-input:focus{border-color:#e8789a;}
+.cp-btns{display:-webkit-flex;display:flex;gap:6px;-webkit-justify-content:flex-end;justify-content:flex-end;}
+.cp-btn{padding:6px 14px;border-radius:3px;font-family:'Noto Sans KR',sans-serif;font-size:12px;cursor:pointer;border:1px solid #666;}
+.cp-btn-ok{background:#c94f72;color:#fff;border-color:#c94f72;}
+.cp-btn-cancel{background:#4a4a4a;color:#ccc;}
+.swatch-large{cursor:pointer;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;}
+.swatch-large input[type=color]{display:none!important;}
 </style>
 </head>
 <body>
 <div class="app">
   <div class="sidebar">
-    <div class="logo">✦ 발췌 생성기</div>
+    <div class="logo">✦ 발췌 생성기<span style="display:flex;align-items:center;gap:4px;"><button id="darkToggle" onclick="toggleDark()" style="background:none;border:none;cursor:pointer;font-size:15px;padding:0;line-height:1;" title="다크모드">🌙</button><span style="font-size:10px;color:var(--muted);letter-spacing:0.04em;">다크 모드</span></span></div>
 
     <div>
       <div class="section-label">본문 입력</div>
-      <textarea id="inputText" placeholder="여기에 내용을 붙여넣으세요.
-
-대사나 일반 문장은 그냥 입력.
-
-*지문은 별표 하나로 감싸면*
-기울어진 이탤릭 폰트로 표시됩니다.
-
-**대사를 별표 두개로 감싸면**
-볼드체로 표시됩니다.
-
-단락은 빈 줄로 구분해요."></textarea>
-    </div>
-
-    <div class="hint-box">
-      <p>
-        <code>*지문*</code> → <em style="color:#e8789a;font-style:italic;">이탤릭 · 연한 색</em><br>
-        <code>**대사**</code> → <strong style="color:#2d1018;">볼드체</strong><br>
-        <code>"대사"</code> → 따옴표 제거 후 기본 폰트 (굽은따옴표도 OK)<br>
-        빈 줄 → 단락 간격 · <code>/</code> 한 줄 → 페이지 분할 (전체 저장 시)
-      </p>
+      <textarea id="inputText" placeholder="✦ NEW (06.08)
+그라데이션 배경 · 프리셋 저장 · 다크 모드 · 컬러 피커
+――――――――――――――――――――
+*지문*   → 이탤릭 · 연한 색
+**대사** → 볼드
+&quot;대사&quot;  → 따옴표 제거
+빈 줄    → 단락 간격
+/        → 페이지 분할"></textarea>
     </div>
 
     <div class="meta-row">
@@ -195,60 +233,102 @@ input[type=range]{flex:1;accent-color:var(--accent);cursor:pointer;}
     </div>
 
     <div class="control-group">
-      <div class="section-label">글자 정렬</div>
-      <div class="seg-row">
-        <div class="seg-btn active" data-align="left">←</div>
-        <div class="seg-btn" data-align="center">↔</div>
-        <div class="seg-btn" data-align="right">→</div>
-      </div>
-    </div>
-
-    <div class="control-group">
-      <div class="section-label">줄바꿈 기준</div>
-      <div class="seg-row">
-        <div class="seg-btn active" data-wrap="char">글자</div>
-        <div class="seg-btn" data-wrap="word">단어</div>
-      </div>
-    </div>
-
-    <div class="control-group">
-      <div class="section-label">글씨 그림자</div>
-      <div class="seg-row">
-        <div class="seg-btn active" data-shadow="off">OFF</div>
-        <div class="seg-btn" data-shadow="on">ON</div>
-      </div>
-    </div>
-
-    <div class="control-group">
-      <div class="section-label">배경 프리셋</div>
-      <div class="color-row" id="bgPresets">
-        <div class="color-swatch active" data-bg="#ffffff" data-fg="#111111" style="background:#ffffff;border:1px solid #e0d0d5;"></div>
-        <div class="color-swatch" data-bg="#f5f0e8" data-fg="#1a1714" style="background:#f5f0e8;"></div>
-        <div class="color-swatch" data-bg="#faf8f4" data-fg="#1a1714" style="background:#faf8f4;"></div>
-        <div class="color-swatch" data-bg="#1a1714" data-fg="#e8e2d9" style="background:#1a1714;border:1px solid #3a3630;"></div>
-        <div class="color-swatch" data-bg="#0d1520" data-fg="#c6d8ec" style="background:#0d1520;border:1px solid #3a3630;"></div>
-        <div class="color-swatch" data-bg="#18112a" data-fg="#ddd0f4" style="background:#18112a;border:1px solid #3a3630;"></div>
-        <div class="color-swatch" data-bg="#f0ebe2" data-fg="#2a1f14" style="background:#f0ebe2;"></div>
-        <div class="color-swatch" data-bg="#ecf2ec" data-fg="#1a2a1c" style="background:#ecf2ec;"></div>
-        <div class="color-swatch" data-bg="#f5eaee" data-fg="#2a1520" style="background:#f5eaee;"></div>
-      </div>
-    </div>
-
-    <div class="control-group">
-      <div class="section-label">색상 직접 설정</div>
-      <div class="color-pair">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;align-items:end;">
         <div>
-          <div class="color-label">배경색</div>
-          <div class="swatch-large" id="bgSwatchWrap" style="background:#ffffff;">
-            <input type="color" id="bgColorPicker" value="#ffffff">
+          <div class="section-label">글자 정렬</div>
+          <div class="seg-row">
+            <div class="seg-btn active" data-align="left">←</div>
+            <div class="seg-btn" data-align="center">↔</div>
+            <div class="seg-btn" data-align="right">→</div>
           </div>
         </div>
         <div>
-          <div class="color-label">글자색</div>
-          <div class="swatch-large" id="fgSwatchWrap" style="background:#111111;">
-            <input type="color" id="fgColorPicker" value="#111111">
+          <div class="section-label">줄바꿈</div>
+          <div class="seg-row">
+            <div class="seg-btn active" data-wrap="char">글자</div>
+            <div class="seg-btn" data-wrap="word">단어</div>
           </div>
         </div>
+        <div>
+          <div class="section-label">그림자</div>
+          <div class="seg-row">
+            <div class="seg-btn active" data-shadow="off">OFF</div>
+            <div class="seg-btn" data-shadow="on">ON</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="control-group">
+
+      <!-- 배경 색상 -->
+      <div class="section-label">배경 색상</div>
+
+      <!-- 단색 / 그라데이션 탭 -->
+      <div class="seg-row" id="bgModeRow">
+        <div class="seg-btn active" data-bgmode="solid">단색</div>
+        <div class="seg-btn" data-bgmode="gradient">그라데이션</div>
+      </div>
+
+      <!-- 단색 패널 -->
+      <div id="solidPanel" style="display:flex;flex-direction:column;gap:8px;margin-top:6px;">
+        <div class="swatch-large" id="bgSwatchWrap" style="background:#ffffff;">
+          <input type="color" id="bgColorPicker" value="#ffffff">
+        </div>
+        <div class="color-row" id="bgPresets">
+          <div class="color-swatch active" data-bg="#ffffff" data-fg="#111111" style="background:#ffffff;border:1px solid #e0d0d5;"></div>
+          <div class="color-swatch" data-bg="#f5f0e8" data-fg="#1a1714" style="background:#f5f0e8;"></div>
+          <div class="color-swatch" data-bg="#faf8f4" data-fg="#1a1714" style="background:#faf8f4;"></div>
+          <div class="color-swatch" data-bg="#1a1714" data-fg="#e8e2d9" style="background:#1a1714;border:1px solid #3a3630;"></div>
+          <div class="color-swatch" data-bg="#0d1520" data-fg="#c6d8ec" style="background:#0d1520;border:1px solid #3a3630;"></div>
+          <div class="color-swatch" data-bg="#18112a" data-fg="#ddd0f4" style="background:#18112a;border:1px solid #3a3630;"></div>
+          <div class="color-swatch" data-bg="#f0ebe2" data-fg="#2a1f14" style="background:#f0ebe2;"></div>
+          <div class="color-swatch" data-bg="#ecf2ec" data-fg="#1a2a1c" style="background:#ecf2ec;"></div>
+          <div class="color-swatch" data-bg="#f5eaee" data-fg="#2a1520" style="background:#f5eaee;"></div>
+        </div>
+      </div>
+
+      <!-- 그라데이션 패널 -->
+      <div id="gradPanel" style="display:none;flex-direction:column;gap:8px;margin-top:6px;">
+        <div class="color-pair">
+          <div>
+            <div class="color-label">시작 색</div>
+            <div class="swatch-large" id="grad1SwatchWrap" style="background:#ffffff;">
+              <input type="color" id="grad1Picker" value="#ffffff">
+            </div>
+          </div>
+          <div>
+            <div class="color-label">끝 색</div>
+            <div class="swatch-large" id="grad2SwatchWrap" style="background:#cccccc;">
+              <input type="color" id="grad2Picker" value="#cccccc">
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="color-label" style="margin-bottom:5px;">방향</div>
+          <div class="seg-row" id="gradTypeRow">
+            <div class="seg-btn active" data-grad="linear-v">세로</div>
+            <div class="seg-btn" data-grad="linear-h">가로</div>
+            <div class="seg-btn" data-grad="linear-d">대각</div>
+          </div>
+        </div>
+        <!-- 그라데이션 프리셋 스워치 -->
+        <div class="color-row" id="gradPresets">
+          <div class="color-swatch" data-g1="#ffd6e0" data-g2="#c9b8ff" style="background:linear-gradient(135deg,#ffd6e0,#c9b8ff);"></div>
+          <div class="color-swatch" data-g1="#d0f0ff" data-g2="#c9b8ff" style="background:linear-gradient(135deg,#d0f0ff,#c9b8ff);"></div>
+          <div class="color-swatch" data-g1="#1a1714" data-g2="#3a3228" style="background:linear-gradient(135deg,#1a1714,#3a3228);border:1px solid #3a3630;"></div>
+          <div class="color-swatch" data-g1="#0d1520" data-g2="#1e3a5f" style="background:linear-gradient(135deg,#0d1520,#1e3a5f);border:1px solid #3a3630;"></div>
+          <div class="color-swatch" data-g1="#f5eaee" data-g2="#e8d5f0" style="background:linear-gradient(135deg,#f5eaee,#e8d5f0);"></div>
+          <div class="color-swatch" data-g1="#ecf2ec" data-g2="#d5e8d5" style="background:linear-gradient(135deg,#ecf2ec,#d5e8d5);"></div>
+          <div class="color-swatch" data-g1="#f5f0e8" data-g2="#e8d5c0" style="background:linear-gradient(135deg,#f5f0e8,#e8d5c0);"></div>
+          <div class="color-swatch" data-g1="#18112a" data-g2="#2a1140" style="background:linear-gradient(135deg,#18112a,#2a1140);border:1px solid #3a3630;"></div>
+        </div>
+      </div>
+
+      <!-- 글자 색상 -->
+      <div class="section-label" style="margin-top:10px;">글자 색상</div>
+      <div class="swatch-large" id="fgSwatchWrap" style="background:#111111;">
+        <input type="color" id="fgColorPicker" value="#111111">
       </div>
     </div>
 
@@ -275,12 +355,22 @@ input[type=range]{flex:1;accent-color:var(--accent);cursor:pointer;}
 
     <div class="divider"></div>
 
+    <div>
+      <div class="section-label" style="margin-bottom:9px;">설정 슬롯</div>
+      <div id="slotList" style="display:flex;flex-direction:column;gap:6px;"></div>
+      <div style="display:flex;flex-direction:column;gap:6px;margin-top:8px;">
+        <button class="action-btn primary" id="saveNewSlotBtn" style="font-size:13px;padding:10px;">＋ 현재 설정 저장</button>
+        <button class="action-btn secondary" id="resetCfgBtn" style="font-size:13px;padding:10px;">↺ 초기화</button>
+      </div>
+      <div id="settingsToast" style="display:none;font-size:11px;color:var(--accent2);text-align:center;margin-top:6px;"></div>
+    </div>
+
   </div>
 
   <div class="main">
     <div class="canvas-wrap">
       <div class="canvas-header">
-        <div class="canvas-logo">✦ 발췌 생성기</div>
+        <div class="canvas-logo">✦ 발췌 생성기<span style="display:flex;align-items:center;gap:4px;"><button onclick="toggleDark()" style="background:none;border:none;cursor:pointer;font-size:15px;padding:0;line-height:1;" title="다크모드">🌙</button><span style="font-size:10px;color:var(--muted);letter-spacing:0.04em;">다크 모드</span></span></div>
         <div class="canvas-divider"></div>
         <div class="section-label" style="margin:0;">미리보기</div>
       </div>
@@ -292,6 +382,73 @@ input[type=range]{flex:1;accent-color:var(--accent);cursor:pointer;}
         <button class="action-btn primary" id="saveAllBtn">⬇ 전체 저장</button>
         <button class="action-btn secondary" id="refreshBtn">↺ 갱신</button>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- 포토샵 스타일 컬러 피커 모달 -->
+<div class="cp-overlay" id="cpModal" style="display:none;">
+  <div class="cp-box">
+    <div class="cp-title" id="cpTitle">색상 선택</div>
+    <div class="cp-body">
+      <div class="cp-sb-wrap" id="cpSbWrap">
+        <canvas class="cp-sb-canvas" id="cpSbCanvas" width="220" height="200"></canvas>
+        <div class="cp-sb-cursor" id="cpSbCursor"></div>
+      </div>
+      <div class="cp-h-wrap" id="cpHWrap">
+        <canvas class="cp-h-canvas" id="cpHCanvas" width="18" height="200"></canvas>
+        <div class="cp-h-cursor" id="cpHCursor" style="top:0;"></div>
+      </div>
+      <div class="cp-right">
+        <div>
+          <div class="cp-preview-row">
+            <div class="cp-swatch-new" id="cpSwatchNew"></div>
+            <div class="cp-swatch-cur" id="cpSwatchCur"></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;">
+            <div class="cp-swatch-label">new</div>
+            <div class="cp-swatch-label">current</div>
+          </div>
+        </div>
+        <div class="cp-fields">
+          <div class="cp-field-row">
+            <div class="cp-field-label">H</div>
+            <input class="cp-field-input" id="cpH" type="number" min="0" max="360" value="0">
+            <span style="font-size:10px;color:#888;">°</span>
+          </div>
+          <div class="cp-field-row">
+            <div class="cp-field-label">S</div>
+            <input class="cp-field-input" id="cpS" type="number" min="0" max="100" value="0">
+            <span style="font-size:10px;color:#888;">%</span>
+          </div>
+          <div class="cp-field-row">
+            <div class="cp-field-label">B</div>
+            <input class="cp-field-input" id="cpB" type="number" min="0" max="100" value="100">
+            <span style="font-size:10px;color:#888;">%</span>
+          </div>
+          <div style="height:4px;"></div>
+          <div class="cp-field-row">
+            <div class="cp-field-label">R</div>
+            <input class="cp-field-input" id="cpR" type="number" min="0" max="255" value="255">
+          </div>
+          <div class="cp-field-row">
+            <div class="cp-field-label">G</div>
+            <input class="cp-field-input" id="cpG" type="number" min="0" max="255" value="255">
+          </div>
+          <div class="cp-field-row">
+            <div class="cp-field-label">Bv</div>
+            <input class="cp-field-input" id="cpBv" type="number" min="0" max="255" value="255">
+          </div>
+        </div>
+        <div class="cp-hex-row">
+          <div class="cp-hex-label">#</div>
+          <input class="cp-hex-input" id="cpHex" type="text" maxlength="6" value="FFFFFF">
+        </div>
+      </div>
+    </div>
+    <div class="cp-btns">
+      <button class="cp-btn cp-btn-cancel" id="cpCancelBtn">취소</button>
+      <button class="cp-btn cp-btn-ok" id="cpOkBtn">확인</button>
     </div>
   </div>
 </div>
@@ -329,6 +486,9 @@ let cfg = {
   bgImg:        null,
   bgImgOpacity: 1,
   bgImgDim:     0,
+  gradType:     'none',
+  grad1:        '#ffffff',
+  grad2:        '#cccccc',
 };
 
 function getRatioWH(ratio, baseW) {
@@ -412,14 +572,14 @@ function layoutSegments(segs, maxW, fontSize, font, mode) {
             }
           } else {
             lines.push({ chars: cur, totalW: curW });
-            const chars = tok.text.split('').map(ch => ({ ch, type: tok.type }));
+            const chars = [...tok.text].map(ch => ({ ch, type: tok.type }));
             cur = chars; curW = tokW;
           }
         }
         // 공백이면 버림(줄 앞 공백 제거)
       } else {
         if (isSpace && cur.length === 0) continue; // 줄 맨 앞 공백 스킵
-        const chars = tok.text.split('').map(ch => ({ ch, type: tok.type }));
+        const chars = [...tok.text].map(ch => ({ ch, type: tok.type }));
         cur.push(...chars); curW += tokW;
       }
     }
@@ -430,7 +590,7 @@ function layoutSegments(segs, maxW, fontSize, font, mode) {
     // ── 글자 단위 줄바꿈 (기존) ──
     const chars = [];
     for (const seg of segs)
-      for (const ch of seg.text) chars.push({ ch, type: seg.type });
+      for (const ch of [...seg.text]) chars.push({ ch, type: seg.type });
 
     const lines = [];
     let cur = [], curW = 0;
@@ -473,11 +633,25 @@ function renderToCtx(targetCtx, targetW, targetH) {
   const maxW = targetW - pad * 2;
   const align = cfg.align;
 
+  // 그라데이션 적용 시 blendHex 기준색은 배경색 그대로 사용
   const didColor  = blendHex(cfg.fg, cfg.bg, 0.42);
   const metaColor = blendHex(cfg.fg, cfg.bg, 0.52);
 
   targetCtx.fillStyle = cfg.bg;
   targetCtx.fillRect(0, 0, targetW, targetH);
+
+  // 배경 그라데이션 (배경 단색 위에 오버레이)
+  if (cfg.gradType !== 'none') {
+    let grd;
+    if (cfg.gradType === 'linear-v') grd = targetCtx.createLinearGradient(0, 0, 0, targetH);
+    else if (cfg.gradType === 'linear-h') grd = targetCtx.createLinearGradient(0, 0, targetW, 0);
+    else grd = targetCtx.createLinearGradient(0, 0, targetW, targetH);
+    grd.addColorStop(0, cfg.grad1 + 'ff');
+    grd.addColorStop(1, cfg.grad2 + 'ff');
+    targetCtx.fillStyle = grd;
+    targetCtx.fillRect(0, 0, targetW, targetH);
+  }
+
   if (cfg.bgImg) {
     targetCtx.save();
     targetCtx.globalAlpha = cfg.bgImgOpacity;
@@ -490,6 +664,34 @@ function renderToCtx(targetCtx, targetW, targetH) {
       targetCtx.fillStyle = 'rgba(0,0,0,' + cfg.bgImgDim + ')';
       targetCtx.fillRect(0, 0, targetW, targetH);
     }
+  }
+
+  // ── 텍스트 없을 때 캔버스 안내문 ──
+  if (!rawText.trim()) {
+    const ph = [
+      { text: '✦ NEW (06.08)', bold: true, color: blendHex(cfg.fg, cfg.bg, 0.15) },
+      { text: '그라데이션 배경 · 프리셋 저장 · 다크 모드 · 컬러 피커', bold: false, color: blendHex(cfg.fg, cfg.bg, 0.15) },
+      { text: '─────────────────', bold: false, color: blendHex(cfg.fg, cfg.bg, 0.5) },
+      { text: '*지문*   → 이탤릭 · 연한 색', bold: false, color: blendHex(cfg.fg, cfg.bg, 0.35) },
+      { text: '**대사** → 볼드', bold: false, color: blendHex(cfg.fg, cfg.bg, 0.35) },
+      { text: '"대사"  → 따옴표 제거', bold: false, color: blendHex(cfg.fg, cfg.bg, 0.35) },
+      { text: '빈 줄    → 단락 간격', bold: false, color: blendHex(cfg.fg, cfg.bg, 0.35) },
+      { text: '/        → 페이지 분할', bold: false, color: blendHex(cfg.fg, cfg.bg, 0.35) },
+    ];
+    const phFs = Math.round(targetW * 0.028);
+    const phLh = phFs * 1.75;
+    const phX  = cfg.padding;
+    const phLineCount = ph.length + 0.5; // 구분선 0.8배 보정
+    const phTotalH = phLineCount * phLh;
+    let phY = (targetH - phTotalH) / 2 + phFs;
+    targetCtx.textBaseline = 'alphabetic';
+    for (const line of ph) {
+      targetCtx.font = (line.bold ? 'bold ' : '') + phFs + 'px ' + cfg.font;
+      targetCtx.fillStyle = line.color;
+      targetCtx.fillText(line.text, phX, phY);
+      phY += phLh * (line.text.startsWith('─') ? 0.8 : 1);
+    }
+    return;
   }
 
   // 줄 단위로 파싱: 빈 줄 = 단락 간격, / 단독 줄 = 페이지 구분 표시
@@ -650,6 +852,18 @@ function renderSinglePara(targetCtx, targetW, targetH, paraText) {
 
   targetCtx.fillStyle = cfg.bg;
   targetCtx.fillRect(0, 0, targetW, targetH);
+
+  if (cfg.gradType !== 'none') {
+    let grd;
+    if (cfg.gradType === 'linear-v') grd = targetCtx.createLinearGradient(0, 0, 0, targetH);
+    else if (cfg.gradType === 'linear-h') grd = targetCtx.createLinearGradient(0, 0, targetW, 0);
+    else grd = targetCtx.createLinearGradient(0, 0, targetW, targetH);
+    grd.addColorStop(0, cfg.grad1 + 'ff');
+    grd.addColorStop(1, cfg.grad2 + 'ff');
+    targetCtx.fillStyle = grd;
+    targetCtx.fillRect(0, 0, targetW, targetH);
+  }
+
   if (cfg.bgImg) {
     targetCtx.save();
     targetCtx.globalAlpha = cfg.bgImgOpacity;
@@ -820,6 +1034,8 @@ document.querySelectorAll('#bgPresets .color-swatch').forEach(sw => {
     document.getElementById('fgColorPicker').value = cfg.fg;
     document.getElementById('bgSwatchWrap').style.background = cfg.bg;
     document.getElementById('fgSwatchWrap').style.background = cfg.fg;
+    // 그라데이션 모드면 색도 배경 기반으로 리셋
+    if (cfg.gradType !== 'none') syncGradToPreset();
     render();
   });
 });
@@ -893,7 +1109,618 @@ document.querySelectorAll('.seg-btn[data-shadow]').forEach(btn => {
   });
 });
 
+// 배경 모드 탭 (단색 / 그라데이션)
+function syncGradToPreset() {
+  cfg.grad1 = cfg.bg;
+  cfg.grad2 = blendHex(cfg.bg, cfg.fg, 0.30);
+  document.getElementById('grad1Picker').value = cfg.grad1;
+  document.getElementById('grad2Picker').value = cfg.grad2;
+  document.getElementById('grad1SwatchWrap').style.background = cfg.grad1;
+  document.getElementById('grad2SwatchWrap').style.background = cfg.grad2;
+}
+
+document.querySelectorAll('#bgModeRow .seg-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#bgModeRow .seg-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    const mode = btn.dataset.bgmode;
+    const solidPanel = document.getElementById('solidPanel');
+    const gradPanel  = document.getElementById('gradPanel');
+    if (mode === 'gradient') {
+      solidPanel.style.display = 'none';
+      gradPanel.style.display  = 'flex';
+      if (cfg.gradType === 'none') {
+        cfg.gradType = 'linear-v';
+        document.querySelector('#gradTypeRow .seg-btn[data-grad="linear-v"]').classList.add('active');
+        syncGradToPreset();
+      }
+    } else {
+      solidPanel.style.display = 'flex';
+      gradPanel.style.display  = 'none';
+      cfg.gradType = 'none';
+    }
+    render();
+  });
+});
+
+// 그라데이션 방향 — 색은 건드리지 않음
+document.querySelectorAll('#gradTypeRow .seg-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#gradTypeRow .seg-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    cfg.gradType = btn.dataset.grad;
+    render();
+  });
+});
+
+// 그라데이션 프리셋
+document.querySelectorAll('#gradPresets .color-swatch').forEach(sw => {
+  sw.addEventListener('click', () => {
+    document.querySelectorAll('#gradPresets .color-swatch').forEach(s=>s.classList.remove('active'));
+    sw.classList.add('active');
+    cfg.grad1 = sw.dataset.g1;
+    cfg.grad2 = sw.dataset.g2;
+    document.getElementById('grad1Picker').value = cfg.grad1;
+    document.getElementById('grad2Picker').value = cfg.grad2;
+    document.getElementById('grad1SwatchWrap').style.background = cfg.grad1;
+    document.getElementById('grad2SwatchWrap').style.background = cfg.grad2;
+    render();
+  });
+});
+
+document.getElementById('grad1Picker').addEventListener('input', e => {
+  cfg.grad1 = e.target.value;
+  document.getElementById('grad1SwatchWrap').style.background = e.target.value;
+  document.querySelectorAll('#gradPresets .color-swatch').forEach(s=>s.classList.remove('active'));
+  render();
+});
+document.getElementById('grad2Picker').addEventListener('input', e => {
+  cfg.grad2 = e.target.value;
+  document.getElementById('grad2SwatchWrap').style.background = e.target.value;
+  document.querySelectorAll('#gradPresets .color-swatch').forEach(s=>s.classList.remove('active'));
+  render();
+});
+
+// ── 커스텀 모달 헬퍼 (사파리 iframe 대응) ──────────────────────
+function modalConfirm(msg, onOk) {
+  var overlay = document.getElementById('customModal');
+  var msgEl   = document.getElementById('modalMsg');
+  var input   = document.getElementById('modalInput');
+  var okBtn   = document.getElementById('modalOk');
+  var cancelBtn = document.getElementById('modalCancel');
+  msgEl.textContent = msg;
+  input.style.display = 'none';
+  okBtn.textContent = '확인'; cancelBtn.textContent = '취소';
+  overlay.style.display = 'flex';
+  var cleanup = function() { overlay.style.display = 'none'; okBtn.onclick = null; cancelBtn.onclick = null; };
+  okBtn.onclick = function() { cleanup(); onOk(); };
+  cancelBtn.onclick = cleanup;
+}
+function modalPrompt(msg, defaultVal, onOk) {
+  var overlay = document.getElementById('customModal');
+  var msgEl   = document.getElementById('modalMsg');
+  var input   = document.getElementById('modalInput');
+  var okBtn   = document.getElementById('modalOk');
+  var cancelBtn = document.getElementById('modalCancel');
+  msgEl.textContent = msg;
+  input.style.display = 'block';
+  input.value = defaultVal || '';
+  okBtn.textContent = '저장'; cancelBtn.textContent = '취소';
+  overlay.style.display = 'flex';
+  setTimeout(function(){ input.focus(); input.select(); }, 80);
+  var cleanup = function() { overlay.style.display = 'none'; okBtn.onclick = null; cancelBtn.onclick = null; input.onkeydown = null; };
+  okBtn.onclick = function() { var v = input.value.trim(); cleanup(); if (v) onOk(v); };
+  cancelBtn.onclick = cleanup;
+  input.onkeydown = function(e) { if (e.key === 'Enter') okBtn.onclick(); if (e.key === 'Escape') cleanup(); };
+}
+
+// ── 설정 슬롯 저장 / 불러오기 / 초기화 ─────────────────────────
+const DEFAULT_CFG = {
+  ratio:'1:1', font:"'Nanum Myeongjo', serif",
+  fontSize:42, lineGap:20, paraGap:24, padding:100,
+  align:'left', wrapMode:'char', textShadow:false,
+  bg:'#ffffff', fg:'#111111',
+  bgImgOpacity:1, bgImgDim:0,
+  gradType:'none', grad1:'#ffffff', grad2:'#cccccc',
+};
+
+function applySettings(saved) {
+  if (!saved) return;
+  if (saved.ratio) {
+    cfg.ratio = saved.ratio;
+    document.querySelectorAll('.ratio-btn').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.ratio === saved.ratio);
+    });
+  }
+  if (saved.font) {
+    cfg.font = saved.font;
+    document.getElementById('fontSelect').value = saved.font;
+  }
+  var sliderDefs = [
+    ['fontSize','fontSizeVal', function(v){return v+'px';}],
+    ['lineGap','lineGapVal',   function(v){return (1+v/42).toFixed(1)+'x';}],
+    ['paraGap','paraGapVal',   function(v){return v+'px';}],
+    ['padding','paddingVal',   function(v){return v+'px';}],
+  ];
+  sliderDefs.forEach(function(item) {
+    var k=item[0], vid=item[1], fmt=item[2];
+    if (saved[k] !== undefined) {
+      cfg[k] = saved[k];
+      var el = document.getElementById(k);
+      if (el) el.value = saved[k];
+      var valEl = document.getElementById(vid);
+      if (valEl) valEl.textContent = fmt(saved[k]);
+    }
+  });
+  if (saved.align) {
+    cfg.align = saved.align;
+    document.querySelectorAll('.seg-btn[data-align]').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.align === saved.align);
+    });
+  }
+  if (saved.wrapMode) {
+    cfg.wrapMode = saved.wrapMode;
+    document.querySelectorAll('.seg-btn[data-wrap]').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.wrap === saved.wrapMode);
+    });
+  }
+  if (saved.textShadow !== undefined) {
+    cfg.textShadow = saved.textShadow;
+    document.querySelectorAll('.seg-btn[data-shadow]').forEach(function(b) {
+      b.classList.toggle('active', (b.dataset.shadow==='on') === saved.textShadow);
+    });
+  }
+  if (saved.bg) {
+    cfg.bg = saved.bg;
+    document.getElementById('bgColorPicker').value = saved.bg;
+    document.getElementById('bgSwatchWrap').style.background = saved.bg;
+  }
+  if (saved.fg) {
+    cfg.fg = saved.fg;
+    document.getElementById('fgColorPicker').value = saved.fg;
+    document.getElementById('fgSwatchWrap').style.background = saved.fg;
+  }
+  if (saved.gradType && saved.gradType !== 'none') {
+    cfg.gradType = saved.gradType;
+    cfg.grad1 = saved.grad1 || cfg.grad1;
+    cfg.grad2 = saved.grad2 || cfg.grad2;
+    document.querySelectorAll('#bgModeRow .seg-btn').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.bgmode === 'gradient');
+    });
+    document.getElementById('solidPanel').style.display = 'none';
+    document.getElementById('gradPanel').style.display  = 'flex';
+    document.querySelectorAll('#gradTypeRow .seg-btn').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.grad === saved.gradType);
+    });
+    document.getElementById('grad1Picker').value = cfg.grad1;
+    document.getElementById('grad2Picker').value = cfg.grad2;
+    document.getElementById('grad1SwatchWrap').style.background = cfg.grad1;
+    document.getElementById('grad2SwatchWrap').style.background = cfg.grad2;
+  } else {
+    cfg.gradType = 'none';
+    document.querySelectorAll('#bgModeRow .seg-btn').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.bgmode === 'solid');
+    });
+    document.getElementById('solidPanel').style.display = 'flex';
+    document.getElementById('gradPanel').style.display  = 'none';
+  }
+  if (saved.bgImgOpacity !== undefined) {
+    cfg.bgImgOpacity = saved.bgImgOpacity;
+    var el = document.getElementById('bgImgOpacity');
+    if (el) { el.value = Math.round(saved.bgImgOpacity*100); document.getElementById('bgImgOpacityVal').textContent = el.value+'%'; }
+  }
+  if (saved.bgImgDim !== undefined) {
+    cfg.bgImgDim = saved.bgImgDim;
+    var el2 = document.getElementById('bgImgDim');
+    if (el2) { el2.value = Math.round(saved.bgImgDim*100); document.getElementById('bgImgDimVal').textContent = el2.value+'%'; }
+  }
+  render();
+}
+
+function showToast(msg) {
+  var t = document.getElementById('settingsToast');
+  t.textContent = msg; t.style.display = 'block';
+  clearTimeout(t._timer);
+  t._timer = setTimeout(function(){ t.style.display='none'; }, 2200);
+}
+
+function loadSlots() {
+  try { return JSON.parse(localStorage.getItem('baechuiSlots')) || []; }
+  catch(e) { return []; }
+}
+function saveSlots(slots) {
+  localStorage.setItem('baechuiSlots', JSON.stringify(slots));
+}
+
+function renderSlotList() {
+  var slots = loadSlots();
+  var list = document.getElementById('slotList');
+  list.innerHTML = '';
+  if (slots.length === 0) {
+    list.innerHTML = '<div style="font-size:11px;color:var(--muted);text-align:center;padding:6px 0;">저장된 설정이 없습니다</div>';
+    return;
+  }
+  slots.forEach(function(slot, i) {
+    var row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;gap:6px;background:var(--panel2);border:1px solid var(--border);border-radius:6px;padding:7px 8px;';
+
+    var preview = document.createElement('div');
+    preview.style.cssText = 'display:flex;gap:3px;flex-shrink:0;';
+    var dot1 = document.createElement('div');
+    dot1.style.cssText = 'width:10px;height:10px;border-radius:50%;border:1px solid var(--border);background:'+slot.cfg.bg+';';
+    var dot2 = document.createElement('div');
+    dot2.style.cssText = 'width:10px;height:10px;border-radius:50%;border:1px solid var(--border);background:'+slot.cfg.fg+';';
+    preview.appendChild(dot1); preview.appendChild(dot2);
+
+    var nameEl = document.createElement('span');
+    nameEl.style.cssText = 'flex:1;font-size:12px;color:var(--text);cursor:pointer;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;';
+    nameEl.textContent = slot.name;
+    nameEl.title = '탭해서 이름 변경';
+    (function(idx, sname){
+      nameEl.addEventListener('click', function() {
+        modalPrompt('슬롯 이름 변경:', sname, function(newName) {
+          var slots2 = loadSlots();
+          slots2[idx].name = newName;
+          saveSlots(slots2);
+          });
+      });
+    })(i, slot.name);
+
+    var applyBtn = document.createElement('button');
+    applyBtn.textContent = '적용';
+    applyBtn.style.cssText = 'font-size:11px;padding:3px 8px;border:1px solid var(--accent2);border-radius:4px;background:transparent;color:var(--accent2);cursor:pointer;flex-shrink:0;font-family:inherit;';
+    (function(scfg, sname){
+      applyBtn.addEventListener('click', function() {
+        applySettings(scfg);
+        showToast('✓ "'+sname+'" 적용됨');
+      });
+    })(slot.cfg, slot.name);
+
+    var delBtn = document.createElement('button');
+    delBtn.textContent = '✕';
+    delBtn.style.cssText = 'font-size:11px;padding:3px 7px;border:1px solid var(--border);border-radius:4px;background:transparent;color:var(--muted);cursor:pointer;flex-shrink:0;font-family:inherit;';
+    (function(idx, sname){
+      delBtn.addEventListener('click', function() {
+        modalConfirm('"'+sname+'" 슬롯을 삭제할까요?', function() {
+          var slots2 = loadSlots();
+          slots2.splice(idx, 1);
+          saveSlots(slots2);
+          renderSlotList();
+          showToast('삭제되었습니다');
+        });
+      });
+    })(i, slot.name);
+
+    row.appendChild(preview);
+    row.appendChild(nameEl);
+    row.appendChild(applyBtn);
+    row.appendChild(delBtn);
+    list.appendChild(row);
+  });
+}
+
+document.getElementById('saveNewSlotBtn').addEventListener('click', function() {
+  var slots = loadSlots();
+  var defaultName = '설정 ' + (slots.length + 1);
+  modalPrompt('이 슬롯의 이름을 입력하세요:', defaultName, function(name) {
+    var toSave = Object.assign({}, cfg);
+    delete toSave.bgImg;
+    slots.push({ name: name, cfg: toSave });
+    saveSlots(slots);
+    renderSlotList();
+    showToast('✓ "'+name+'" 저장됨');
+  });
+});
+
+document.getElementById('resetCfgBtn').addEventListener('click', function() {
+  modalConfirm('현재 설정을 초기값으로 되돌릴까요?\n(저장된 슬롯은 유지됩니다)', function() {
+    applySettings(DEFAULT_CFG);
+    showToast('↺ 초기화되었습니다');
+  });
+});
+
+renderSlotList();
+
+// ── 다크모드 ──────────────────────────────────────────────────
+function toggleDark() {
+  var isDark = document.body.classList.toggle('dark');
+  localStorage.setItem('baechuiDark', isDark ? '1' : '0');
+  document.querySelectorAll('[onclick="toggleDark()"]').forEach(function(btn) {
+    btn.textContent = isDark ? '☀️' : '🌙';
+  });
+}
+(function() {
+  if (localStorage.getItem('baechuiDark') === '1') {
+    document.body.classList.add('dark');
+    document.querySelectorAll('[onclick="toggleDark()"]').forEach(function(btn) {
+      btn.textContent = '☀️';
+    });
+  }
+})();
+
 document.fonts.ready.then(render);
+
+// ══════════════════════════════════════════════
+//  포토샵 스타일 컬러 피커
+// ══════════════════════════════════════════════
+(function() {
+  var modal   = document.getElementById('cpModal');
+  var sbWrap  = document.getElementById('cpSbWrap');
+  var sbCanvas = document.getElementById('cpSbCanvas');
+  var sbCtx   = sbCanvas.getContext('2d');
+  var sbCursor = document.getElementById('cpSbCursor');
+  var hWrap   = document.getElementById('cpHWrap');
+  var hCanvas = document.getElementById('cpHCanvas');
+  var hCtx    = hCanvas.getContext('2d');
+  var hCursor = document.getElementById('cpHCursor');
+  var swNew   = document.getElementById('cpSwatchNew');
+  var swCur   = document.getElementById('cpSwatchCur');
+  var inH     = document.getElementById('cpH');
+  var inS     = document.getElementById('cpS');
+  var inBsat  = document.getElementById('cpB');
+  var inR     = document.getElementById('cpR');
+  var inG     = document.getElementById('cpG');
+  var inBv    = document.getElementById('cpBv');
+  var inHex   = document.getElementById('cpHex');
+  var okBtn   = document.getElementById('cpOkBtn');
+  var cancelBtn = document.getElementById('cpCancelBtn');
+  var cpTitle = document.getElementById('cpTitle');
+
+  // 현재 선택 중인 HSB
+  var state = { h:0, s:0, b:100 }; // h 0-360, s/b 0-100
+  var originalHex = '#ffffff';
+  var onConfirm = null;
+
+  // ── 헬퍼 ──────────────────────────────────
+  function hsbToRgb(h,s,b) {
+    s /= 100; b /= 100;
+    var k = function(n){ return (n + h/60) % 6; };
+    var f = function(n){ return b*(1 - s*Math.max(0, Math.min(k(n), 4-k(n), 1))); };
+    return [Math.round(f(5)*255), Math.round(f(3)*255), Math.round(f(1)*255)];
+  }
+  function rgbToHsb(r,g,b) {
+    r/=255; g/=255; b/=255;
+    var max=Math.max(r,g,b), min=Math.min(r,g,b), d=max-min;
+    var h=0,s=max===0?0:d/max, bv=max;
+    if(d!==0){
+      if(max===r) h=((g-b)/d)%6;
+      else if(max===g) h=(b-r)/d+2;
+      else h=(r-g)/d+4;
+      h=Math.round(h*60); if(h<0) h+=360;
+    }
+    return [h, Math.round(s*100), Math.round(bv*100)];
+  }
+  function hexToRgb(hex) {
+    hex = hex.replace('#','');
+    if(hex.length===3) hex=hex.split('').map(c=>c+c).join('');
+    var n=parseInt(hex,16);
+    return [(n>>16)&255,(n>>8)&255,n&255];
+  }
+  function rgbToHex(r,g,b){
+    return ('000000'+((r<<16)|(g<<8)|b).toString(16)).slice(-6).toUpperCase();
+  }
+  function clamp(v,mn,mx){ return Math.max(mn,Math.min(mx,v)); }
+
+  // ── 렌더링 ────────────────────────────────
+  function drawSbCanvas() {
+    var W = sbCanvas.width || 220;
+    var H = sbCanvas.height || 170;
+    var rgb = hsbToRgb(state.h,100,100);
+    var gradH = sbCtx.createLinearGradient(0,0,W,0);
+    gradH.addColorStop(0,'#ffffff');
+    gradH.addColorStop(1,'rgb('+rgb[0]+','+rgb[1]+','+rgb[2]+')');
+    sbCtx.fillStyle = gradH;
+    sbCtx.fillRect(0,0,W,H);
+    var gradV = sbCtx.createLinearGradient(0,0,0,H);
+    gradV.addColorStop(0,'rgba(0,0,0,0)');
+    gradV.addColorStop(1,'rgba(0,0,0,1)');
+    sbCtx.fillStyle = gradV;
+    sbCtx.fillRect(0,0,W,H);
+    var cx = (state.s/100)*100;
+    var cy = (1 - state.b/100)*100;
+    sbCursor.style.left = cx+'%';
+    sbCursor.style.top  = cy+'%';
+  }
+
+  function drawHCanvas() {
+    var W = hCanvas.width || 16;
+    var H = hCanvas.height || 170;
+    for(var y=0;y<H;y++){
+      var h=Math.round((y/H)*360);
+      var rgb=hsbToRgb(h,100,100);
+      hCtx.fillStyle='rgb('+rgb[0]+','+rgb[1]+','+rgb[2]+')';
+      hCtx.fillRect(0,y,W,1);
+    }
+    hCursor.style.top = ((state.h/360)*100)+'%';
+  }
+
+  function updateAll() {
+    var rgb = hsbToRgb(state.h, state.s, state.b);
+    var hex = rgbToHex(rgb[0],rgb[1],rgb[2]);
+    inH.value   = state.h;
+    inS.value   = state.s;
+    inBsat.value= state.b;
+    inR.value   = rgb[0];
+    inG.value   = rgb[1];
+    inBv.value  = rgb[2];
+    inHex.value = hex;
+    swNew.style.background = '#'+hex;
+    drawSbCanvas();
+    hCursor.style.top = ((state.h/360)*100)+'%';
+  }
+
+  function setFromHex(hex) {
+    hex = hex.replace('#','');
+    if(hex.length!==6) return;
+    var rgb = hexToRgb(hex);
+    var hsb = rgbToHsb(rgb[0],rgb[1],rgb[2]);
+    state.h=hsb[0]; state.s=hsb[1]; state.b=hsb[2];
+    updateAll();
+  }
+
+  // ── 드래그: SB 패드 ──────────────────────
+  var draggingSb = false;
+  function sbPointerPos(e) {
+    var rect = sbWrap.getBoundingClientRect();
+    var cx = e.touches ? e.touches[0].clientX : e.clientX;
+    var cy = e.touches ? e.touches[0].clientY : e.clientY;
+    var x = clamp(cx - rect.left, 0, rect.width);
+    var y = clamp(cy - rect.top,  0, rect.height);
+    state.s = Math.round((x/rect.width)*100);
+    state.b = Math.round((1-(y/rect.height))*100);
+    updateAll();
+  }
+  sbWrap.addEventListener('mousedown', function(e){ draggingSb=true; sbPointerPos(e); e.preventDefault(); });
+  try { sbWrap.addEventListener('touchstart', function(e){ draggingSb=true; sbPointerPos(e); e.preventDefault(); }, {passive:false}); }
+  catch(ex) { sbWrap.addEventListener('touchstart', function(e){ draggingSb=true; sbPointerPos(e); e.preventDefault(); }); }
+  document.addEventListener('mousemove', function(e){ if(draggingSb) sbPointerPos(e); });
+  try { document.addEventListener('touchmove', function(e){ if(draggingSb) sbPointerPos(e); }, {passive:false}); }
+  catch(ex) { document.addEventListener('touchmove', function(e){ if(draggingSb) sbPointerPos(e); }); }
+  document.addEventListener('mouseup', function(){ draggingSb=false; });
+  document.addEventListener('touchend', function(){ draggingSb=false; });
+
+  // ── 드래그: H 바 ────────────────────────
+  var draggingH = false;
+  function hPointerPos(e) {
+    var rect = hWrap.getBoundingClientRect();
+    var cy = e.touches ? e.touches[0].clientY : e.clientY;
+    var y = clamp(cy - rect.top, 0, rect.height);
+    state.h = Math.round((y/rect.height)*360);
+    if(state.h>=360) state.h=359;
+    updateAll();
+  }
+  hWrap.addEventListener('mousedown', function(e){ draggingH=true; hPointerPos(e); e.preventDefault(); });
+  try { hWrap.addEventListener('touchstart', function(e){ draggingH=true; hPointerPos(e); e.preventDefault(); }, {passive:false}); }
+  catch(ex) { hWrap.addEventListener('touchstart', function(e){ draggingH=true; hPointerPos(e); e.preventDefault(); }); }
+  document.addEventListener('mousemove', function(e){ if(draggingH) hPointerPos(e); });
+  try { document.addEventListener('touchmove', function(e){ if(draggingH) hPointerPos(e); }, {passive:false}); }
+  catch(ex) { document.addEventListener('touchmove', function(e){ if(draggingH) hPointerPos(e); }); }
+  document.addEventListener('mouseup', function(){ draggingH=false; });
+  document.addEventListener('touchend', function(){ draggingH=false; });
+
+  // ── 숫자 입력 ────────────────────────────
+  function onHsbInput() {
+    state.h = clamp(parseInt(inH.value)||0, 0, 359);
+    state.s = clamp(parseInt(inS.value)||0, 0, 100);
+    state.b = clamp(parseInt(inBsat.value)||0, 0, 100);
+    updateAll();
+  }
+  function onRgbInput() {
+    var r = clamp(parseInt(inR.value)||0,0,255);
+    var g = clamp(parseInt(inG.value)||0,0,255);
+    var b = clamp(parseInt(inBv.value)||0,0,255);
+    var hsb = rgbToHsb(r,g,b);
+    state.h=hsb[0]; state.s=hsb[1]; state.b=hsb[2];
+    updateAll();
+  }
+  [inH,inS,inBsat].forEach(function(el){ el.addEventListener('change', onHsbInput); el.addEventListener('input', onHsbInput); });
+  [inR,inG,inBv].forEach(function(el){ el.addEventListener('change', onRgbInput); el.addEventListener('input', onRgbInput); });
+  inHex.addEventListener('change', function(){ setFromHex(inHex.value); });
+  inHex.addEventListener('input', function(){ if(inHex.value.length===6) setFromHex(inHex.value); });
+
+  // ── 공개 API ──────────────────────────────
+  window.openColorPicker = function(title, currentHex, callback) {
+    cpTitle.textContent = title;
+    var h = currentHex.replace('#','');
+    while(h.length < 6) h = h + '0';
+    modal.style.display = 'flex';
+    // 모달이 표시된 후 실제 크기로 canvas 맞춤
+    setTimeout(function() {
+      var sbRect = sbWrap.getBoundingClientRect();
+      var hRect  = hWrap.getBoundingClientRect();
+      sbCanvas.width  = Math.round(sbRect.width)  || 200;
+      sbCanvas.height = Math.round(sbRect.height) || 170;
+      hCanvas.width   = Math.round(hRect.width)   || 16;
+      hCanvas.height  = Math.round(hRect.height)  || 170;
+      setFromHex(h);
+      swCur.style.background = currentHex;
+      originalHex = currentHex;
+      onConfirm = callback;
+      drawHCanvas();
+      drawSbCanvas();
+    }, 20);
+  };
+
+  okBtn.addEventListener('click', function() {
+    if(onConfirm) onConfirm('#'+inHex.value.toUpperCase());
+    modal.style.display = 'none';
+  });
+  cancelBtn.addEventListener('click', function() {
+    modal.style.display = 'none';
+  });
+  modal.addEventListener('click', function(e){ if(e.target===modal) modal.style.display='none'; });
+})();
+
+// ── 기존 swatch-large 클릭 → 커스텀 피커 열기 ──
+(function() {
+  function hookSwatch(swatchWrapId, pickerId, title, getCfgKey, setCfgAndRender) {
+    var wrap = document.getElementById(swatchWrapId);
+    if(!wrap) return;
+    wrap.addEventListener('click', function(e) {
+      e.preventDefault();
+      var currentColor = getCfgKey();
+      openColorPicker(title, currentColor, function(hex) {
+        setCfgAndRender(hex);
+      });
+    });
+  }
+
+  // 글자 색상
+  hookSwatch('fgSwatchWrap', 'fgColorPicker', '색상 선택 (글자 색상)',
+    function(){ return cfg.fg; },
+    function(hex){
+      cfg.fg = hex;
+      document.getElementById('fgSwatchWrap').style.background = hex;
+      // 프리셋 active 해제
+      document.querySelectorAll('#bgPresets .color-swatch').forEach(function(s){ s.classList.remove('active'); });
+      render();
+    }
+  );
+
+  // 배경 단색
+  hookSwatch('bgSwatchWrap', 'bgColorPicker', '색상 선택 (배경 색상)',
+    function(){ return cfg.bg; },
+    function(hex){
+      cfg.bg = hex;
+      document.getElementById('bgSwatchWrap').style.background = hex;
+      document.querySelectorAll('#bgPresets .color-swatch').forEach(function(s){ s.classList.remove('active'); });
+      render();
+    }
+  );
+
+  // 그라데이션 시작 색
+  hookSwatch('grad1SwatchWrap', 'grad1Picker', '색상 선택 (그라데이션 시작)',
+    function(){ return cfg.grad1; },
+    function(hex){
+      cfg.grad1 = hex;
+      document.getElementById('grad1SwatchWrap').style.background = hex;
+      document.querySelectorAll('#gradPresets .color-swatch').forEach(function(s){ s.classList.remove('active'); });
+      render();
+    }
+  );
+
+  // 그라데이션 끝 색
+  hookSwatch('grad2SwatchWrap', 'grad2Picker', '색상 선택 (그라데이션 끝)',
+    function(){ return cfg.grad2; },
+    function(hex){
+      cfg.grad2 = hex;
+      document.getElementById('grad2SwatchWrap').style.background = hex;
+      document.querySelectorAll('#gradPresets .color-swatch').forEach(function(s){ s.classList.remove('active'); });
+      render();
+    }
+  );
+})();
 </script>
+
+<div class="modal-overlay" id="customModal" style="display:none;">
+  <div class="modal-box">
+    <div class="modal-msg" id="modalMsg"></div>
+    <input class="modal-input" id="modalInput" type="text" style="display:none;">
+    <div class="modal-btns">
+      <button class="modal-cancel" id="modalCancel">취소</button>
+      <button class="modal-ok" id="modalOk">확인</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
