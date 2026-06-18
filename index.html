@@ -160,8 +160,8 @@ input[type=range]{flex:1;accent-color:var(--accent);cursor:pointer;}
 
     <div>
       <div class="section-label">본문 입력</div>
-      <textarea id="inputText" placeholder="✦ NEW (06.08)
-그라데이션 배경 · 프리셋 저장 · 다크 모드 · 컬러 피커
+      <textarea id="inputText" placeholder="✦ NEW (06.19)
+메타 정보(제작자/캐릭터) 위치 변경
 ――――――――――――――――――――
 *지문*   → 이탤릭 · 연한 색
 **대사** → 볼드
@@ -254,6 +254,26 @@ input[type=range]{flex:1;accent-color:var(--accent);cursor:pointer;}
           <div class="seg-row">
             <div class="seg-btn active" data-shadow="off">OFF</div>
             <div class="seg-btn" data-shadow="on">ON</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="control-group">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;align-items:end;">
+        <div>
+          <div class="section-label">메타 위치</div>
+          <div class="seg-row">
+            <div class="seg-btn active" data-metapos="body">본문↓</div>
+            <div class="seg-btn" data-metapos="canvas">캔버스↓</div>
+          </div>
+        </div>
+        <div>
+          <div class="section-label">메타 정렬</div>
+          <div class="seg-row">
+            <div class="seg-btn active" data-metaalign="left">←</div>
+            <div class="seg-btn" data-metaalign="center">↔</div>
+            <div class="seg-btn" data-metaalign="right">→</div>
           </div>
         </div>
       </div>
@@ -481,6 +501,8 @@ let cfg = {
   align:    'left',
   wrapMode: 'char',
   textShadow: false,
+  metaPos:  'body',   // 'body' = 본문 하단, 'canvas' = 캔버스 하단
+  metaAlign: 'left',  // 'left' | 'center' | 'right'
   bg:       '#ffffff',
   fg:       '#111111',
   bgImg:        null,
@@ -669,8 +691,8 @@ function renderToCtx(targetCtx, targetW, targetH) {
   // ── 텍스트 없을 때 캔버스 안내문 ──
   if (!rawText.trim()) {
     const ph = [
-      { text: '✦ NEW (06.08)', bold: true, color: blendHex(cfg.fg, cfg.bg, 0.15) },
-      { text: '그라데이션 배경 · 프리셋 저장 · 다크 모드 · 컬러 피커', bold: false, color: blendHex(cfg.fg, cfg.bg, 0.15) },
+      { text: '✦ NEW (06.12)', bold: true, color: blendHex(cfg.fg, cfg.bg, 0.15) },
+      { text: '메타 정보(제작자/캐릭터) 위치 변경', bold: false, color: blendHex(cfg.fg, cfg.bg, 0.15) },
       { text: '─────────────────', bold: false, color: blendHex(cfg.fg, cfg.bg, 0.5) },
       { text: '*지문*   → 이탤릭 · 연한 색', bold: false, color: blendHex(cfg.fg, cfg.bg, 0.35) },
       { text: '**대사** → 볼드', bold: false, color: blendHex(cfg.fg, cfg.bg, 0.35) },
@@ -773,16 +795,23 @@ function renderToCtx(targetCtx, targetW, targetH) {
   targetCtx.shadowColor='transparent'; targetCtx.shadowBlur=0; targetCtx.shadowOffsetX=0; targetCtx.shadowOffsetY=0;
 
   if (author || title) {
-    y += 48;
     const metaFs = Math.round(fs * 0.78);
     targetCtx.font      = `${metaFs}px ${cfg.font}`;
     targetCtx.fillStyle = metaColor;
     const meta = [title, author].filter(Boolean).join('  ·  ');
     const metaW = targetCtx.measureText(meta).width;
-    let mx = align==='right'  ? targetW-pad-metaW
-           : align==='center' ? Math.round((targetW-metaW)/2)
-           : pad;
-    targetCtx.fillText(meta, mx, y);
+    const ma = cfg.metaAlign;
+    const mpad = cfg.metaPos === 'canvas' ? 50 : pad;
+    let mx = ma==='right'  ? targetW - mpad - metaW
+           : ma==='center' ? Math.round((targetW - metaW) / 2)
+           : mpad;
+    let my;
+    if (cfg.metaPos === 'canvas') {
+      my = targetH - 50;
+    } else {
+      my = y + 48;
+    }
+    targetCtx.fillText(meta, mx, my);
   }
 }
 
@@ -916,17 +945,23 @@ function renderSinglePara(targetCtx, targetW, targetH, paraText) {
   targetCtx.shadowColor='transparent'; targetCtx.shadowBlur=0; targetCtx.shadowOffsetX=0; targetCtx.shadowOffsetY=0;
 
   if (author || title) {
-    y += 48;
     const metaFs = Math.round(fs * 0.78);
     targetCtx.font      = `${metaFs}px ${cfg.font}`;
     targetCtx.fillStyle = metaColor;
     const metaStr = [title, author].filter(Boolean).join(' · ');
     const metaW   = targetCtx.measureText(metaStr).width;
-    let mx;
-    if (align === 'center') mx = Math.round((targetW - metaW) / 2);
-    else if (align === 'right') mx = targetW - pad - metaW;
-    else mx = pad;
-    targetCtx.fillText(metaStr, mx, y);
+    const ma = cfg.metaAlign;
+    const mpad = cfg.metaPos === 'canvas' ? 50 : pad;
+    let mx = ma==='right'  ? targetW - mpad - metaW
+           : ma==='center' ? Math.round((targetW - metaW) / 2)
+           : mpad;
+    let my;
+    if (cfg.metaPos === 'canvas') {
+      my = targetH - 50;
+    } else {
+      my = y + 48;
+    }
+    targetCtx.fillText(metaStr, mx, my);
   }
 }
 
@@ -1004,6 +1039,20 @@ document.querySelectorAll('.seg-btn[data-wrap]').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.seg-btn[data-wrap]').forEach(b=>b.classList.remove('active'));
     btn.classList.add('active'); cfg.wrapMode = btn.dataset.wrap; render();
+  });
+});
+
+document.querySelectorAll('.seg-btn[data-metapos]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.seg-btn[data-metapos]').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active'); cfg.metaPos = btn.dataset.metapos; render();
+  });
+});
+
+document.querySelectorAll('.seg-btn[data-metaalign]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.seg-btn[data-metaalign]').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active'); cfg.metaAlign = btn.dataset.metaalign; render();
   });
 });
 
@@ -1219,6 +1268,7 @@ const DEFAULT_CFG = {
   ratio:'1:1', font:"'Nanum Myeongjo', serif",
   fontSize:42, lineGap:20, paraGap:24, padding:100,
   align:'left', wrapMode:'char', textShadow:false,
+  metaPos:'body', metaAlign:'left',
   bg:'#ffffff', fg:'#111111',
   bgImgOpacity:1, bgImgDim:0,
   gradType:'none', grad1:'#ffffff', grad2:'#cccccc',
@@ -1268,6 +1318,18 @@ function applySettings(saved) {
     cfg.textShadow = saved.textShadow;
     document.querySelectorAll('.seg-btn[data-shadow]').forEach(function(b) {
       b.classList.toggle('active', (b.dataset.shadow==='on') === saved.textShadow);
+    });
+  }
+  if (saved.metaPos) {
+    cfg.metaPos = saved.metaPos;
+    document.querySelectorAll('.seg-btn[data-metapos]').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.metapos === saved.metaPos);
+    });
+  }
+  if (saved.metaAlign) {
+    cfg.metaAlign = saved.metaAlign;
+    document.querySelectorAll('.seg-btn[data-metaalign]').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.metaalign === saved.metaAlign);
     });
   }
   if (saved.bg) {
