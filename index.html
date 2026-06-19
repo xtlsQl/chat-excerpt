@@ -21,7 +21,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Noto S
 .app{display:grid;grid-template-columns:340px 1fr;height:100vh;}
 .sidebar{background:var(--panel);border-right:1px solid var(--border);padding:20px;overflow-y:auto;display:flex;flex-direction:column;gap:14px;}
 .main{padding:24px;overflow-y:auto;display:flex;flex-direction:column;align-items:center;gap:16px;background:var(--bg);}
-.canvas-wrap{width:100%;max-width:600px;}
+.canvas-wrap{width:100%;max-width:660px;}
 .logo{font-family:'Nanum Myeongjo',serif;font-size:15px;color:var(--accent2);letter-spacing:0.12em;padding-bottom:14px;border-bottom:1px solid var(--border);display:flex;align-items:baseline;justify-content:space-between;}
 .logo-date{font-family:'Noto Sans KR',sans-serif;font-size:10px;color:var(--muted);letter-spacing:0.05em;font-weight:400;}
 .section-label{font-size:11px;color:var(--muted);letter-spacing:0.1em;margin-bottom:7px;text-transform:uppercase;}
@@ -97,6 +97,7 @@ input[type=range]{flex:1;accent-color:var(--accent);cursor:pointer;}
   .canvas-header .section-label{display:none;}/* 미리보기 글씨 숨김 */
   .canvas-outer{justify-content:center;}
   #previewCanvas{width:auto !important;height:48vw !important;max-width:100%;}
+  #previewCanvas.ratio-wide-mobile{width:100% !important;height:auto !important;}
   /* 사이드바 - 남은 공간 차지하며 내부만 스크롤 */
   .sidebar{
     order:2;
@@ -160,8 +161,8 @@ input[type=range]{flex:1;accent-color:var(--accent);cursor:pointer;}
 
     <div>
       <div class="section-label">본문 입력</div>
-      <textarea id="inputText" placeholder="✦ NEW (06.08)
-그라데이션 배경 · 프리셋 저장 · 다크 모드 · 컬러 피커
+      <textarea id="inputText" placeholder="✦ NEW (6.19)
+메타 정보 위치 변경 · 헤더 사이즈 추가 · 배경 이미지 확대/축소/이동 · 대사 컬러 변경
 ――――――――――――――――――――
 *지문*   → 이탤릭 · 연한 색
 **대사** → 볼드
@@ -189,6 +190,7 @@ input[type=range]{flex:1;accent-color:var(--accent);cursor:pointer;}
         <div class="ratio-btn active" data-ratio="1:1">1:1</div>
         <div class="ratio-btn" data-ratio="3:4">3:4</div>
         <div class="ratio-btn" data-ratio="16:9">16:9</div>
+        <div class="ratio-btn" data-ratio="twitter" style="font-size:10px;">트위터 헤더</div>
       </div>
     </div>
 
@@ -212,8 +214,8 @@ input[type=range]{flex:1;accent-color:var(--accent);cursor:pointer;}
       <div class="section-label">텍스트 설정</div>
       <div class="row">
         <label>글자 크기</label>
-        <input type="range" id="fontSize" min="20" max="120" value="42" step="1">
-        <span class="val" id="fontSizeVal">42px</span>
+        <input type="range" id="fontSize" min="20" max="120" value="24" step="1">
+        <span class="val" id="fontSizeVal">24px</span>
       </div>
       <div class="row">
         <label>줄 간격</label>
@@ -254,6 +256,26 @@ input[type=range]{flex:1;accent-color:var(--accent);cursor:pointer;}
           <div class="seg-row">
             <div class="seg-btn active" data-shadow="off">OFF</div>
             <div class="seg-btn" data-shadow="on">ON</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="control-group">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;align-items:end;">
+        <div>
+          <div class="section-label">메타 위치</div>
+          <div class="seg-row">
+            <div class="seg-btn active" data-metapos="body">본문↓</div>
+            <div class="seg-btn" data-metapos="canvas">캔버스↓</div>
+          </div>
+        </div>
+        <div>
+          <div class="section-label">메타 정렬</div>
+          <div class="seg-row">
+            <div class="seg-btn active" data-metaalign="left">←</div>
+            <div class="seg-btn" data-metaalign="center">↔</div>
+            <div class="seg-btn" data-metaalign="right">→</div>
           </div>
         </div>
       </div>
@@ -330,6 +352,15 @@ input[type=range]{flex:1;accent-color:var(--accent);cursor:pointer;}
       <div class="swatch-large" id="fgSwatchWrap" style="background:#111111;">
         <input type="color" id="fgColorPicker" value="#111111">
       </div>
+
+      <!-- 대사 색상 -->
+      <div class="row" style="margin-top:10px;align-items:center;">
+        <label style="min-width:auto;flex:1;">'대사' 색상</label>
+        <button class="action-btn secondary" id="dialogueColorToggle" style="width:auto;font-size:11px;padding:5px 9px;">기본값 사용</button>
+      </div>
+      <div class="swatch-large" id="dialogueSwatchWrap" style="background:#111111;display:none;">
+        <input type="color" id="dialogueColorPicker" value="#111111">
+      </div>
     </div>
 
     <div class="control-group">
@@ -349,6 +380,13 @@ input[type=range]{flex:1;accent-color:var(--accent);cursor:pointer;}
           <input type="range" id="bgImgDim" min="0" max="90" value="0" step="5">
           <span class="val" id="bgImgDimVal">0%</span>
         </div>
+        <div class="row">
+          <label>확대/축소</label>
+          <input type="range" id="bgImgScale" min="100" max="300" value="100" step="1">
+          <span class="val" id="bgImgScaleVal">100%</span>
+        </div>
+        <div style="font-size:10.5px;color:var(--muted);line-height:1.5;">미리보기 화면을 드래그하면 이미지 위치를 옮길 수 있어요.</div>
+        <button class="action-btn secondary" id="bgImgResetPos" style="font-size:12px;padding:7px;">↺ 위치/크기 초기화</button>
         <button class="action-btn secondary" id="bgImgRemove" style="font-size:12px;padding:7px;">✕ 이미지 제거</button>
       </div>
     </div>
@@ -474,18 +512,24 @@ const DESIGN_W = 1080;
 let cfg = {
   ratio:    '1:1',
   font:     "'Nanum Myeongjo', serif",
-  fontSize: 42,
+  fontSize: 24,
   lineGap:  20,
   paraGap:  24,
   padding:  100,
   align:    'left',
   wrapMode: 'char',
   textShadow: false,
+  metaPos:  'body',   // 'body' = 본문 하단, 'canvas' = 캔버스 하단
+  metaAlign: 'left',  // 'left' | 'center' | 'right'
   bg:       '#ffffff',
   fg:       '#111111',
   bgImg:        null,
   bgImgOpacity: 1,
   bgImgDim:     0,
+  bgImgScale:   1,
+  bgImgOffsetX: 0,
+  bgImgOffsetY: 0,
+  dialogueColor: null,
   gradType:     'none',
   grad1:        '#ffffff',
   grad2:        '#cccccc',
@@ -495,6 +539,7 @@ function getRatioWH(ratio, baseW) {
   if (ratio === '1:1')  return [baseW, baseW];
   if (ratio === '3:4')  return [baseW, Math.round(baseW * 4 / 3)];
   if (ratio === '16:9') return [baseW, Math.round(baseW * 9 / 16)];
+  if (ratio === 'twitter') return [baseW, Math.round(baseW * 500 / 1500)];
   return [baseW, baseW];
 }
 
@@ -652,25 +697,14 @@ function renderToCtx(targetCtx, targetW, targetH) {
     targetCtx.fillRect(0, 0, targetW, targetH);
   }
 
-  if (cfg.bgImg) {
-    targetCtx.save();
-    targetCtx.globalAlpha = cfg.bgImgOpacity;
-    const _iw = cfg.bgImg.naturalWidth, _ih = cfg.bgImg.naturalHeight;
-    const _sc = Math.max(targetW / _iw, targetH / _ih);
-    const _dw = _iw * _sc, _dh = _ih * _sc;
-    targetCtx.drawImage(cfg.bgImg, (targetW-_dw)/2, (targetH-_dh)/2, _dw, _dh);
-    targetCtx.restore();
-    if (cfg.bgImgDim > 0) {
-      targetCtx.fillStyle = 'rgba(0,0,0,' + cfg.bgImgDim + ')';
-      targetCtx.fillRect(0, 0, targetW, targetH);
-    }
-  }
+  drawBgImage(targetCtx, targetW, targetH);
 
   // ── 텍스트 없을 때 캔버스 안내문 ──
   if (!rawText.trim()) {
     const ph = [
-      { text: '✦ NEW (06.08)', bold: true, color: blendHex(cfg.fg, cfg.bg, 0.15) },
-      { text: '그라데이션 배경 · 프리셋 저장 · 다크 모드 · 컬러 피커', bold: false, color: blendHex(cfg.fg, cfg.bg, 0.15) },
+      { text: '✦ NEW (6.19)', bold: true, color: blendHex(cfg.fg, cfg.bg, 0.15) },
+      { text: '메타 정보 위치 변경 · 헤더 사이즈 추가', bold: false, color: blendHex(cfg.fg, cfg.bg, 0.15) },
+      { text: '배경 이미지 확대/축소/이동 · 대사 컬러 변경', bold: false, color: blendHex(cfg.fg, cfg.bg, 0.15) },
       { text: '─────────────────', bold: false, color: blendHex(cfg.fg, cfg.bg, 0.5) },
       { text: '*지문*   → 이탤릭 · 연한 색', bold: false, color: blendHex(cfg.fg, cfg.bg, 0.35) },
       { text: '**대사** → 볼드', bold: false, color: blendHex(cfg.fg, cfg.bg, 0.35) },
@@ -728,7 +762,10 @@ function renderToCtx(targetCtx, targetW, targetH) {
       else totalH += lh;
     }
   }
-  const metaH = (author||title) ? Math.round(fs*0.82) + 48 : 0;
+  const META_FS = (cfg.ratio === '16:9' || cfg.ratio === 'twitter') ? 24 : 28; // 메타 글자 크기 고정 (본문 크기와 무관)
+  const META_GAP = 30; // 본문 마지막 디센더 끝 → 메타까지 고정 간격
+  const META_DESC = Math.round(fs * 0.2); // 디센더 보정
+  const metaH = (author||title) ? META_DESC + META_GAP + META_FS : 0;
   totalH += metaH;
 
   let y = Math.round((targetH - totalH) / 2) + fs;
@@ -762,7 +799,7 @@ function renderToCtx(targetCtx, targetW, targetH) {
           const isDid = item.type === 'didascalia';
           const isBold = item.type === 'bold';
           targetCtx.font      = isDid ? `italic ${fs}px ${cfg.font}` : isBold ? `bold ${fs}px ${cfg.font}` : `${fs}px ${cfg.font}`;
-          targetCtx.fillStyle = isDid ? didColor : cfg.fg;
+          targetCtx.fillStyle = isDid ? didColor : (cfg.dialogueColor || cfg.fg);
           targetCtx.fillText(item.ch, x, y);
           x += targetCtx.measureText(item.ch).width;
         }
@@ -773,16 +810,52 @@ function renderToCtx(targetCtx, targetW, targetH) {
   targetCtx.shadowColor='transparent'; targetCtx.shadowBlur=0; targetCtx.shadowOffsetX=0; targetCtx.shadowOffsetY=0;
 
   if (author || title) {
-    y += 48;
-    const metaFs = Math.round(fs * 0.78);
-    targetCtx.font      = `${metaFs}px ${cfg.font}`;
+    targetCtx.font      = `${META_FS}px ${cfg.font}`;
     targetCtx.fillStyle = metaColor;
     const meta = [title, author].filter(Boolean).join('  ·  ');
     const metaW = targetCtx.measureText(meta).width;
-    let mx = align==='right'  ? targetW-pad-metaW
-           : align==='center' ? Math.round((targetW-metaW)/2)
-           : pad;
-    targetCtx.fillText(meta, mx, y);
+    const ma = cfg.metaAlign;
+    const mpad = cfg.metaPos === 'canvas' ? 50 : pad;
+    let mx = ma==='right'  ? targetW - mpad - metaW
+           : ma==='center' ? Math.round((targetW - metaW) / 2)
+           : mpad;
+    let my;
+    if (cfg.metaPos === 'canvas') {
+      my = targetH - 50;
+    } else {
+      my = (y - lh) + META_DESC + META_GAP + META_FS;
+    }
+    targetCtx.fillText(meta, mx, my);
+  }
+}
+
+// ── 배경 이미지: cover-fit + 확대/이동 적용 ──
+function drawBgImage(targetCtx, targetW, targetH) {
+  if (!cfg.bgImg) return;
+  targetCtx.save();
+  targetCtx.globalAlpha = cfg.bgImgOpacity;
+  const _iw = cfg.bgImg.naturalWidth, _ih = cfg.bgImg.naturalHeight;
+  const _baseSc = Math.max(targetW / _iw, targetH / _ih);
+  const _sc = _baseSc * (cfg.bgImgScale || 1);
+  const _dw = _iw * _sc, _dh = _ih * _sc;
+  // 오프셋은 DESIGN_W 기준 px → 현재 targetW 비율로 환산
+  const _ratio = targetW / DESIGN_W;
+  const _offX = (cfg.bgImgOffsetX || 0) * _ratio;
+  const _offY = (cfg.bgImgOffsetY || 0) * _ratio;
+  let _dx = (targetW - _dw) / 2 + _offX;
+  let _dy = (targetH - _dh) / 2 + _offY;
+  // 빈 여백이 생기지 않도록 이동 범위 제한
+  const _minX = targetW - _dw, _maxX = 0;
+  const _minY = targetH - _dh, _maxY = 0;
+  if (_dw >= targetW) _dx = Math.min(_maxX, Math.max(_minX, _dx));
+  else _dx = (targetW - _dw) / 2;
+  if (_dh >= targetH) _dy = Math.min(_maxY, Math.max(_minY, _dy));
+  else _dy = (targetH - _dh) / 2;
+  targetCtx.drawImage(cfg.bgImg, _dx, _dy, _dw, _dh);
+  targetCtx.restore();
+  if (cfg.bgImgDim > 0) {
+    targetCtx.fillStyle = 'rgba(0,0,0,' + cfg.bgImgDim + ')';
+    targetCtx.fillRect(0, 0, targetW, targetH);
   }
 }
 
@@ -795,6 +868,15 @@ function render() {
   canvas.style.width  = '100%';
   canvas.style.height = 'auto';
   canvas.style.aspectRatio = `${cw} / ${ch}`;
+  // 모바일: 트위터 헤더(가로로 매우 넓은 비율)만 너비 100% 기준으로 표시, 나머지는 기존 방식 유지
+  const canvasOuterEl = document.getElementById('canvasOuter');
+  if (cfg.ratio === 'twitter') {
+    canvas.classList.add('ratio-wide-mobile');
+    canvasOuterEl.style.maxWidth = '100%';
+  } else {
+    canvas.classList.remove('ratio-wide-mobile');
+    canvasOuterEl.style.maxWidth = '';
+  }
   ctx.setTransform(1,0,0,1,0,0);
   renderToCtx(ctx, cw, ch);
 }
@@ -864,19 +946,7 @@ function renderSinglePara(targetCtx, targetW, targetH, paraText) {
     targetCtx.fillRect(0, 0, targetW, targetH);
   }
 
-  if (cfg.bgImg) {
-    targetCtx.save();
-    targetCtx.globalAlpha = cfg.bgImgOpacity;
-    const _iw = cfg.bgImg.naturalWidth, _ih = cfg.bgImg.naturalHeight;
-    const _sc = Math.max(targetW / _iw, targetH / _ih);
-    const _dw = _iw * _sc, _dh = _ih * _sc;
-    targetCtx.drawImage(cfg.bgImg, (targetW-_dw)/2, (targetH-_dh)/2, _dw, _dh);
-    targetCtx.restore();
-    if (cfg.bgImgDim > 0) {
-      targetCtx.fillStyle = 'rgba(0,0,0,' + cfg.bgImgDim + ')';
-      targetCtx.fillRect(0, 0, targetW, targetH);
-    }
-  }
+  drawBgImage(targetCtx, targetW, targetH);
 
   const group = [];
   let pendingGap = false;
@@ -888,7 +958,10 @@ function renderSinglePara(targetCtx, targetW, targetH, paraText) {
     for (const l of laid) group.push(l);
   }
 
-  const metaH = (author||title) ? Math.round(fs*0.82) + 48 : 0;
+  const META_FS = (cfg.ratio === '16:9' || cfg.ratio === 'twitter') ? 24 : 28;
+  const META_GAP = 30;
+  const META_DESC = Math.round(fs * 0.2);
+  const metaH = (author||title) ? META_DESC + META_GAP + META_FS : 0;
   let totalH = 0;
   for (const line of group) totalH += line.__gap ? cfg.paraGap : lh;
   totalH += metaH;
@@ -907,7 +980,7 @@ function renderSinglePara(targetCtx, targetW, targetH, paraText) {
       const isDid = item.type === 'didascalia';
       const isBold = item.type === 'bold';
       targetCtx.font      = isDid ? `italic ${fs}px ${cfg.font}` : isBold ? `bold ${fs}px ${cfg.font}` : `${fs}px ${cfg.font}`;
-      targetCtx.fillStyle = isDid ? didColor : cfg.fg;
+      targetCtx.fillStyle = isDid ? didColor : (cfg.dialogueColor || cfg.fg);
       targetCtx.fillText(item.ch, x, y);
       x += targetCtx.measureText(item.ch).width;
     }
@@ -916,17 +989,22 @@ function renderSinglePara(targetCtx, targetW, targetH, paraText) {
   targetCtx.shadowColor='transparent'; targetCtx.shadowBlur=0; targetCtx.shadowOffsetX=0; targetCtx.shadowOffsetY=0;
 
   if (author || title) {
-    y += 48;
-    const metaFs = Math.round(fs * 0.78);
-    targetCtx.font      = `${metaFs}px ${cfg.font}`;
+    targetCtx.font      = `${META_FS}px ${cfg.font}`;
     targetCtx.fillStyle = metaColor;
     const metaStr = [title, author].filter(Boolean).join(' · ');
     const metaW   = targetCtx.measureText(metaStr).width;
-    let mx;
-    if (align === 'center') mx = Math.round((targetW - metaW) / 2);
-    else if (align === 'right') mx = targetW - pad - metaW;
-    else mx = pad;
-    targetCtx.fillText(metaStr, mx, y);
+    const ma = cfg.metaAlign;
+    const mpad = cfg.metaPos === 'canvas' ? 50 : pad;
+    let mx = ma==='right'  ? targetW - mpad - metaW
+           : ma==='center' ? Math.round((targetW - metaW) / 2)
+           : mpad;
+    let my;
+    if (cfg.metaPos === 'canvas') {
+      my = targetH - 50;
+    } else {
+      my = (y - lh) + META_DESC + META_GAP + META_FS;
+    }
+    targetCtx.fillText(metaStr, mx, my);
   }
 }
 
@@ -989,6 +1067,24 @@ document.querySelectorAll('.ratio-btn').forEach(btn => {
   });
 });
 
+document.getElementById('dialogueColorToggle').addEventListener('click', () => {
+  const wrap = document.getElementById('dialogueSwatchWrap');
+  const btn = document.getElementById('dialogueColorToggle');
+  if (cfg.dialogueColor) {
+    // 커스텀 색상 해제 → 기본값(글자 색상)으로
+    cfg.dialogueColor = null;
+    wrap.style.display = 'none';
+    btn.textContent = '기본값 사용';
+  } else {
+    // 커스텀 색상 활성화 (현재 글자 색상에서 시작)
+    cfg.dialogueColor = cfg.fg;
+    wrap.style.background = cfg.dialogueColor;
+    wrap.style.display = 'block';
+    btn.textContent = '기본값으로';
+  }
+  render();
+});
+
 document.getElementById('fontSelect').addEventListener('change', e => {
   cfg.font = e.target.value; render();
 });
@@ -1004,6 +1100,20 @@ document.querySelectorAll('.seg-btn[data-wrap]').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.seg-btn[data-wrap]').forEach(b=>b.classList.remove('active'));
     btn.classList.add('active'); cfg.wrapMode = btn.dataset.wrap; render();
+  });
+});
+
+document.querySelectorAll('.seg-btn[data-metapos]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.seg-btn[data-metapos]').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active'); cfg.metaPos = btn.dataset.metapos; render();
+  });
+});
+
+document.querySelectorAll('.seg-btn[data-metaalign]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.seg-btn[data-metaalign]').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active'); cfg.metaAlign = btn.dataset.metaalign; render();
   });
 });
 
@@ -1071,7 +1181,11 @@ document.getElementById('bgImgInput').addEventListener('change', e => {
     const img = new Image();
     img.onload = () => {
       cfg.bgImg = img;
+      cfg.bgImgScale = 1; cfg.bgImgOffsetX = 0; cfg.bgImgOffsetY = 0;
+      document.getElementById('bgImgScale').value = 100;
+      document.getElementById('bgImgScaleVal').textContent = '100%';
       document.getElementById('bgImgControls').style.display = 'flex';
+      canvas.style.cursor = 'grab';
       const name = file.name;
       document.getElementById('bgImgAddBtn').textContent = '🖼 ' + (name.length > 18 ? name.slice(0,18)+'…' : name);
       render();
@@ -1091,16 +1205,65 @@ document.getElementById('bgImgDim').addEventListener('input', e => {
   render();
 });
 document.getElementById('bgImgRemove').addEventListener('click', () => {
-  cfg.bgImg = null; cfg.bgImgOpacity = 1; cfg.bgImgDim = 0;
+  cfg.bgImg = null; cfg.bgImgOpacity = 1; cfg.bgImgDim = 0; cfg.bgImgScale = 1; cfg.bgImgOffsetX = 0; cfg.bgImgOffsetY = 0;
   document.getElementById('bgImgInput').value = '';
   document.getElementById('bgImgAddBtn').textContent = '＋ 이미지 추가';
   document.getElementById('bgImgControls').style.display = 'none';
   document.getElementById('bgImgOpacity').value = 100;
   document.getElementById('bgImgDim').value = 0;
+  document.getElementById('bgImgScale').value = 100;
   document.getElementById('bgImgOpacityVal').textContent = '100%';
   document.getElementById('bgImgDimVal').textContent = '0%';
+  document.getElementById('bgImgScaleVal').textContent = '100%';
+  canvas.style.cursor = 'default';
   render();
 });
+document.getElementById('bgImgScale').addEventListener('input', e => {
+  cfg.bgImgScale = parseInt(e.target.value) / 100;
+  document.getElementById('bgImgScaleVal').textContent = e.target.value + '%';
+  render();
+});
+document.getElementById('bgImgResetPos').addEventListener('click', () => {
+  cfg.bgImgScale = 1; cfg.bgImgOffsetX = 0; cfg.bgImgOffsetY = 0;
+  document.getElementById('bgImgScale').value = 100;
+  document.getElementById('bgImgScaleVal').textContent = '100%';
+  render();
+});
+
+// ── 배경 이미지: 캔버스 드래그로 위치 이동 ──
+(function() {
+  let dragging = false, startX = 0, startY = 0, startOffX = 0, startOffY = 0;
+  function pointerXY(e) {
+    if (e.touches && e.touches.length) return [e.touches[0].clientX, e.touches[0].clientY];
+    return [e.clientX, e.clientY];
+  }
+  function onDown(e) {
+    if (!cfg.bgImg) return;
+    dragging = true;
+    const [x, y] = pointerXY(e);
+    startX = x; startY = y;
+    startOffX = cfg.bgImgOffsetX || 0; startOffY = cfg.bgImgOffsetY || 0;
+    canvas.style.cursor = 'grabbing';
+  }
+  function onMove(e) {
+    if (!dragging || !cfg.bgImg) return;
+    e.preventDefault();
+    const [x, y] = pointerXY(e);
+    // 화면 px → 디자인(DESIGN_W) px 비율 환산
+    const rect = canvas.getBoundingClientRect();
+    const scaleRatio = DESIGN_W / rect.width;
+    cfg.bgImgOffsetX = startOffX + (x - startX) * scaleRatio;
+    cfg.bgImgOffsetY = startOffY + (y - startY) * scaleRatio;
+    render();
+  }
+  function onUp() { dragging = false; canvas.style.cursor = cfg.bgImg ? 'grab' : 'default'; }
+  canvas.addEventListener('mousedown', onDown);
+  canvas.addEventListener('touchstart', onDown, {passive:true});
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('touchmove', onMove, {passive:false});
+  document.addEventListener('mouseup', onUp);
+  document.addEventListener('touchend', onUp);
+})();
 
 document.querySelectorAll('.seg-btn[data-shadow]').forEach(btn => {
   btn.addEventListener('click', () => {
@@ -1217,8 +1380,9 @@ function modalPrompt(msg, defaultVal, onOk) {
 // ── 설정 슬롯 저장 / 불러오기 / 초기화 ─────────────────────────
 const DEFAULT_CFG = {
   ratio:'1:1', font:"'Nanum Myeongjo', serif",
-  fontSize:42, lineGap:20, paraGap:24, padding:100,
+  fontSize:24, lineGap:20, paraGap:24, padding:100,
   align:'left', wrapMode:'char', textShadow:false,
+  metaPos:'body', metaAlign:'left',
   bg:'#ffffff', fg:'#111111',
   bgImgOpacity:1, bgImgDim:0,
   gradType:'none', grad1:'#ffffff', grad2:'#cccccc',
@@ -1268,6 +1432,18 @@ function applySettings(saved) {
     cfg.textShadow = saved.textShadow;
     document.querySelectorAll('.seg-btn[data-shadow]').forEach(function(b) {
       b.classList.toggle('active', (b.dataset.shadow==='on') === saved.textShadow);
+    });
+  }
+  if (saved.metaPos) {
+    cfg.metaPos = saved.metaPos;
+    document.querySelectorAll('.seg-btn[data-metapos]').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.metapos === saved.metaPos);
+    });
+  }
+  if (saved.metaAlign) {
+    cfg.metaAlign = saved.metaAlign;
+    document.querySelectorAll('.seg-btn[data-metaalign]').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.metaalign === saved.metaAlign);
     });
   }
   if (saved.bg) {
@@ -1673,6 +1849,16 @@ document.fonts.ready.then(render);
       document.getElementById('fgSwatchWrap').style.background = hex;
       // 프리셋 active 해제
       document.querySelectorAll('#bgPresets .color-swatch').forEach(function(s){ s.classList.remove('active'); });
+      render();
+    }
+  );
+
+  // 대사 색상
+  hookSwatch('dialogueSwatchWrap', 'dialogueColorPicker', '색상 선택 (\'대사\' 색상)',
+    function(){ return cfg.dialogueColor || cfg.fg; },
+    function(hex){
+      cfg.dialogueColor = hex;
+      document.getElementById('dialogueSwatchWrap').style.background = hex;
       render();
     }
   );
