@@ -382,7 +382,7 @@ input[type=range]{flex:1;accent-color:var(--accent);cursor:pointer;}
         </div>
         <div class="row">
           <label>확대/축소</label>
-          <input type="range" id="bgImgScale" min="100" max="300" value="100" step="1">
+          <input type="range" id="bgImgScale" min="30" max="300" value="100" step="1">
           <span class="val" id="bgImgScaleVal">100%</span>
         </div>
         <div style="font-size:10.5px;color:var(--muted);line-height:1.5;">미리보기 화면을 드래그하면 이미지 위치를 옮길 수 있어요.</div>
@@ -844,13 +844,11 @@ function drawBgImage(targetCtx, targetW, targetH) {
   const _offY = (cfg.bgImgOffsetY || 0) * _ratio;
   let _dx = (targetW - _dw) / 2 + _offX;
   let _dy = (targetH - _dh) / 2 + _offY;
-  // 빈 여백이 생기지 않도록 이동 범위 제한
-  const _minX = targetW - _dw, _maxX = 0;
-  const _minY = targetH - _dh, _maxY = 0;
-  if (_dw >= targetW) _dx = Math.min(_maxX, Math.max(_minX, _dx));
-  else _dx = (targetW - _dw) / 2;
-  if (_dh >= targetH) _dy = Math.min(_maxY, Math.max(_minY, _dy));
-  else _dy = (targetH - _dh) / 2;
+  // 이미지가 캔버스보다 크면: 빈 여백 안 생기게 제한 / 작으면: 캔버스 범위 안에서만 움직이게 제한
+  _dx = (_dw >= targetW) ? Math.min(0, Math.max(targetW - _dw, _dx))
+                          : Math.min(targetW - _dw, Math.max(0, _dx));
+  _dy = (_dh >= targetH) ? Math.min(0, Math.max(targetH - _dh, _dy))
+                          : Math.min(targetH - _dh, Math.max(0, _dy));
   targetCtx.drawImage(cfg.bgImg, _dx, _dy, _dw, _dh);
   targetCtx.restore();
   if (cfg.bgImgDim > 0) {
