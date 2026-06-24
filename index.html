@@ -577,12 +577,22 @@ function layoutSegments(segs, maxW, fontSize, font, mode) {
     return ctx.measureText(ch).width;
   }
 
+  // 플레이스홀더를 강제 줄바꿈 마커로 변환
+  const NL = '\x00NL\x00';
+  const expandedSegs = [];
+  for (const seg of segs) {
+    const parts = seg.text.split(NL);
+    for (let i = 0; i < parts.length; i++) {
+      if (i > 0) expandedSegs.push({ type: '__newline__', text: '' });
+      if (parts[i].length > 0) expandedSegs.push({ type: seg.type, text: parts[i] });
+    }
+  }
+
   if (mode === 'word') {
     // ── 단어 단위 줄바꿈 ──
-    // 먼저 세그먼트를 "토큰"(단어/공백) 단위로 쪼갬
     const tokens = [];
-    for (const seg of segs) {
-      // 공백 기준으로 split하되 공백 자체도 토큰으로 유지
+    for (const seg of expandedSegs) {
+      if (seg.type === '__newline__') { tokens.push({ text: '\x00NL\x00', type: '__newline__' }); continue; }
       const parts = seg.text.split(/(\s+)/);
       for (const p of parts) {
         if (p.length === 0) continue;
@@ -594,16 +604,16 @@ function layoutSegments(segs, maxW, fontSize, font, mode) {
     let cur = [], curW = 0;
 
     for (const tok of tokens) {
-      // 토큰 전체 너비 계산
+      if (tok.type === '__newline__') {
+        lines.push({ chars: cur, totalW: curW });
+        cur = []; curW = 0;
+        continue;
+      }
       let tokW = 0;
       for (const ch of tok.text) tokW += cw(ch, tok.type);
-
       const isSpace = /^\s+$/.test(tok.text);
-
       if (curW + tokW > maxW && cur.length > 0) {
-        // 줄바꿈 — 뒤따르는 공백 토큰이면 그냥 버리고 다음 줄로
         if (!isSpace) {
-          // 단어 자체가 maxW보다 길면 글자 단위로 강제 분할
           if (tokW > maxW) {
             lines.push({ chars: cur, totalW: curW });
             cur = []; curW = 0;
@@ -621,9 +631,8 @@ function layoutSegments(segs, maxW, fontSize, font, mode) {
             cur = chars; curW = tokW;
           }
         }
-        // 공백이면 버림(줄 앞 공백 제거)
       } else {
-        if (isSpace && cur.length === 0) continue; // 줄 맨 앞 공백 스킵
+        if (isSpace && cur.length === 0) continue;
         const chars = [...tok.text].map(ch => ({ ch, type: tok.type }));
         cur.push(...chars); curW += tokW;
       }
@@ -632,14 +641,21 @@ function layoutSegments(segs, maxW, fontSize, font, mode) {
     return lines;
 
   } else {
-    // ── 글자 단위 줄바꿈 (기존) ──
+    // ── 글자 단위 줄바꿈 ──
     const chars = [];
-    for (const seg of segs)
+    for (const seg of expandedSegs) {
+      if (seg.type === '__newline__') { chars.push({ ch: '\x00NL\x00', type: '__newline__' }); continue; }
       for (const ch of [...seg.text]) chars.push({ ch, type: seg.type });
+    }
 
     const lines = [];
     let cur = [], curW = 0;
     for (const item of chars) {
+      if (item.type === '__newline__') {
+        lines.push({ chars: cur, totalW: curW });
+        cur = []; curW = 0;
+        continue;
+      }
       const w = cw(item.ch, item.type);
       if (curW + w > maxW && cur.length > 0) {
         lines.push({ chars: cur, totalW: curW });
@@ -728,8 +744,15 @@ function renderToCtx(targetCtx, targetW, targetH) {
     return;
   }
 
+  // 멀티라인 *...* / **...** / "..."/"..." 내부의 줄바꿈을 플레이스홀더로 치환
+  const NL_PLACEHOLDER = '\x00NL\x00';
+  const preprocessed = rawText
+    .replace(/\*\*([\s\S]*?)\*\*/g, (_, inner) => '**' + inner.replace(/\n/g, NL_PLACEHOLDER) + '**')
+    .replace(/(?<!\*)\*(?!\*)([\s\S]*?)(?<!\*)\*(?!\*)/g, (_, inner) => '*' + inner.replace(/\n/g, NL_PLACEHOLDER) + '*')
+    .replace(/[“"]([\s\S]*?)[”"]/g, (_, inner) => '\u201c' + inner.replace(/\n/g, NL_PLACEHOLDER) + '\u201d');
+
   // 줄 단위로 파싱: 빈 줄 = 단락 간격, / 단독 줄 = 페이지 구분 표시
-  const lines = rawText.split('\n');
+  const lines = preprocessed.split('\n');
   const allGroups = [];
   let curGroup = [];
   let pendingGap = false;
@@ -860,13 +883,12 @@ function drawBgImage(targetCtx, targetW, targetH) {
 // ── 렌더 & 저장 ───────────────────────────────
 function render() {
   const [cw, ch] = getRatioWH(cfg.ratio, DESIGN_W);
-  canvas.width  = cw;
-  canvas.height = ch;
-  // CSS로 축소 표시 — 이것이 참고 사이트와 동일한 방식
+  const dpr = Math.min(window.devicePixelRatio || 1, 3);
+  canvas.width  = cw * dpr;
+  canvas.height = ch * dpr;
   canvas.style.width  = '100%';
   canvas.style.height = 'auto';
   canvas.style.aspectRatio = `${cw} / ${ch}`;
-  // 모바일: 트위터 헤더(가로로 매우 넓은 비율)만 너비 100% 기준으로 표시, 나머지는 기존 방식 유지
   const canvasOuterEl = document.getElementById('canvasOuter');
   if (cfg.ratio === 'twitter') {
     canvas.classList.add('ratio-wide-mobile');
@@ -876,6 +898,7 @@ function render() {
     canvasOuterEl.style.maxWidth = '';
   }
   ctx.setTransform(1,0,0,1,0,0);
+  ctx.scale(dpr, dpr);
   renderToCtx(ctx, cw, ch);
 }
 
@@ -948,7 +971,12 @@ function renderSinglePara(targetCtx, targetW, targetH, paraText) {
 
   const group = [];
   let pendingGap = false;
-  for (const rl of paraText.split('\n')) {
+  const NL_PLACEHOLDER2 = '\x00NL\x00';
+  const preprocessedPara = paraText
+    .replace(/\*\*([\s\S]*?)\*\*/g, (_, inner) => '**' + inner.replace(/\n/g, NL_PLACEHOLDER2) + '**')
+    .replace(/(?<!\*)\*(?!\*)([\s\S]*?)(?<!\*)\*(?!\*)/g, (_, inner) => '*' + inner.replace(/\n/g, NL_PLACEHOLDER2) + '*')
+    .replace(/[“"]([\s\S]*?)[”"]/g, (_, inner) => '\u201c' + inner.replace(/\n/g, NL_PLACEHOLDER2) + '\u201d');
+  for (const rl of preprocessedPara.split('\n')) {
     const trimmed = rl.trim();
     if (trimmed === '') { pendingGap = true; continue; }
     if (pendingGap && group.length) { group.push({ __gap: true }); pendingGap = false; }
