@@ -812,7 +812,7 @@ function renderToCtx(targetCtx, targetW, targetH) {
   if (author || title) {
     targetCtx.font      = `${META_FS}px ${cfg.font}`;
     targetCtx.fillStyle = metaColor;
-    const meta = [title, author].filter(Boolean).join(' · ');
+    const meta = [title, author].filter(Boolean).join('  ·  ');
     const metaW = targetCtx.measureText(meta).width;
     const ma = cfg.metaAlign;
     const mpad = cfg.metaPos === 'canvas' ? 50 : pad;
@@ -989,7 +989,7 @@ function renderSinglePara(targetCtx, targetW, targetH, paraText) {
   if (author || title) {
     targetCtx.font      = `${META_FS}px ${cfg.font}`;
     targetCtx.fillStyle = metaColor;
-    const metaStr = [title, author].filter(Boolean).join(' · ');
+    const metaStr = [title, author].filter(Boolean).join('  ·  ');
     const metaW   = targetCtx.measureText(metaStr).width;
     const ma = cfg.metaAlign;
     const mpad = cfg.metaPos === 'canvas' ? 50 : pad;
