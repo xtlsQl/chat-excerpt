@@ -904,10 +904,12 @@ function render() {
 
 document.getElementById('saveBtn').addEventListener('click', () => {
   const [cw, ch] = getRatioWH(cfg.ratio, DESIGN_W);
+  const SCALE = 2;
   const offCanvas = document.createElement('canvas');
-  offCanvas.width  = cw;
-  offCanvas.height = ch;
+  offCanvas.width  = cw * SCALE;
+  offCanvas.height = ch * SCALE;
   const offCtx = offCanvas.getContext('2d');
+  offCtx.scale(SCALE, SCALE);
   renderToCtx(offCtx, cw, ch);
   const dataUrl = offCanvas.toDataURL('image/png');
 
@@ -1064,13 +1066,16 @@ document.getElementById('saveAllBtn').addEventListener('click', () => {
   if (paras.length === 0) return;
 
   const [cw, ch] = getRatioWH(cfg.ratio, DESIGN_W);
+  const SCALE = 2;
   const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
   const dataUrls = [];
 
   for (const para of paras) {
     const off = document.createElement('canvas');
-    off.width = cw; off.height = ch;
-    renderSinglePara(off.getContext('2d'), cw, ch, para);
+    off.width = cw * SCALE; off.height = ch * SCALE;
+    const offCtx = off.getContext('2d');
+    offCtx.scale(SCALE, SCALE);
+    renderSinglePara(offCtx, cw, ch, para);
     dataUrls.push(off.toDataURL('image/png'));
   }
 
