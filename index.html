@@ -161,8 +161,8 @@ input[type=range]{flex:1;accent-color:var(--accent);cursor:pointer;}
 
     <div>
       <div class="section-label">본문 입력</div>
-      <textarea id="inputText" placeholder="✦ NEW (6.19)
-메타 정보 위치 변경 · 헤더 사이즈 추가 · 배경 이미지 확대/축소/이동 · 대사 컬러 변경
+      <textarea id="inputText" placeholder="✦ NEW (07.05)
+이미지 해상도 저하 문제 해결 · 그 외 자잘한 오류 수정
 ――――――――――――――――――――
 *지문*   → 이탤릭 · 연한 색
 **대사** → 볼드
@@ -214,7 +214,7 @@ input[type=range]{flex:1;accent-color:var(--accent);cursor:pointer;}
       <div class="section-label">텍스트 설정</div>
       <div class="row">
         <label>글자 크기</label>
-        <input type="range" id="fontSize" min="20" max="120" value="24" step="1">
+        <input type="range" id="fontSize" min="8" max="120" value="24" step="1">
         <span class="val" id="fontSizeVal">24px</span>
       </div>
       <div class="row">
@@ -718,9 +718,8 @@ function renderToCtx(targetCtx, targetW, targetH) {
   // ── 텍스트 없을 때 캔버스 안내문 ──
   if (!rawText.trim()) {
     const ph = [
-      { text: '✦ NEW (6.19)', bold: true, color: blendHex(cfg.fg, cfg.bg, 0.15) },
-      { text: '메타 정보 위치 변경 · 헤더 사이즈 추가', bold: false, color: blendHex(cfg.fg, cfg.bg, 0.15) },
-      { text: '배경 이미지 확대/축소/이동 · 대사 컬러 변경', bold: false, color: blendHex(cfg.fg, cfg.bg, 0.15) },
+      { text: '✦ NEW (07.05)', bold: true, color: blendHex(cfg.fg, cfg.bg, 0.15) },
+      { text: '이미지 해상도 저하 문제 해결 · 그 외 자잘한 오류 수정', bold: false, color: blendHex(cfg.fg, cfg.bg, 0.15) },
       { text: '─────────────────', bold: false, color: blendHex(cfg.fg, cfg.bg, 0.5) },
       { text: '*지문*   → 이탤릭 · 연한 색', bold: false, color: blendHex(cfg.fg, cfg.bg, 0.35) },
       { text: '**대사** → 볼드', bold: false, color: blendHex(cfg.fg, cfg.bg, 0.35) },
@@ -788,11 +787,15 @@ function renderToCtx(targetCtx, targetW, targetH) {
   const META_FS = (cfg.ratio === '16:9' || cfg.ratio === 'twitter') ? 18 : 22; // 메타 글자 크기 고정 (본문 크기와 무관)
   const META_GAP = 30; // 본문 마지막 디센더 끝 → 메타까지 고정 간격
   const META_DESC = Math.round(fs * 0.2); // 디센더 보정
-  const metaH = (author||title) ? META_DESC + META_GAP + META_FS : 0;
+  // metaPos==='canvas'일 때 메타는 캔버스 하단 고정 → 텍스트 블록 높이 계산에서 제외
+  const metaH = (author||title) && cfg.metaPos !== 'canvas' ? META_DESC + META_GAP + META_FS : 0;
   totalH += metaH;
 
+  // 텍스트 블록을 수직 중앙 정렬
+  // 클램프는 pad가 아닌 고정 최솟값(40px)으로 - pad가 크면 y가 아래로 밀리는 버그 방지
+  const MIN_TOP = 40;
   let y = Math.round((targetH - totalH) / 2) + fs;
-  if (y < pad) y = pad + fs;
+  if (y < MIN_TOP + fs) y = MIN_TOP + fs;
 
   targetCtx.textBaseline = 'alphabetic';
   if (cfg.textShadow) { targetCtx.shadowColor='rgba(0,0,0,0.18)'; targetCtx.shadowBlur=6; targetCtx.shadowOffsetX=1; targetCtx.shadowOffsetY=1; }
@@ -989,13 +992,14 @@ function renderSinglePara(targetCtx, targetW, targetH, paraText) {
   const META_FS = (cfg.ratio === '16:9' || cfg.ratio === 'twitter') ? 18 : 22;
   const META_GAP = 30;
   const META_DESC = Math.round(fs * 0.2);
-  const metaH = (author||title) ? META_DESC + META_GAP + META_FS : 0;
+  const metaH = (author||title) && cfg.metaPos !== 'canvas' ? META_DESC + META_GAP + META_FS : 0;
   let totalH = 0;
   for (const line of group) totalH += line.__gap ? cfg.paraGap : lh;
   totalH += metaH;
 
+  const MIN_TOP2 = 40;
   let y = Math.round((targetH - totalH) / 2) + fs;
-  if (y < pad) y = pad + fs;
+  if (y < MIN_TOP2 + fs) y = MIN_TOP2 + fs;
 
   if (cfg.textShadow) { targetCtx.shadowColor='rgba(0,0,0,0.18)'; targetCtx.shadowBlur=6; targetCtx.shadowOffsetX=1; targetCtx.shadowOffsetY=1; }
   for (const line of group) {
@@ -1149,7 +1153,7 @@ document.querySelectorAll('.seg-btn[data-metaalign]').forEach(btn => {
 });
 
 [
-  ['fontSize','fontSizeVal', v=>`${v}px`,                v=>{ cfg.fontSize=v; }],
+  ['fontSize','fontSizeVal', v=>`${v}px`,                v=>{ cfg.fontSize=v; document.getElementById('lineGapVal').textContent = ((v+cfg.lineGap)/v).toFixed(1)+'x'; }],
   ['lineGap', 'lineGapVal',  v=>`${((cfg.fontSize+v)/cfg.fontSize).toFixed(1)}x`, v=>{ cfg.lineGap=v; }],
   ['paraGap', 'paraGapVal',  v=>`${v}px`,                v=>{ cfg.paraGap=v; }],
   ['padding', 'paddingVal',  v=>`${v}px`,                v=>{ cfg.padding=v; }],
@@ -1414,7 +1418,7 @@ const DEFAULT_CFG = {
   fontSize:24, lineGap:20, paraGap:24, padding:100,
   align:'left', wrapMode:'char', textShadow:false,
   metaPos:'body', metaAlign:'left',
-  bg:'#ffffff', fg:'#111111',
+  bg:'#ffffff', fg:'#111111', dialogueColor:null,
   bgImgOpacity:1, bgImgDim:0,
   gradType:'none', grad1:'#ffffff', grad2:'#cccccc',
 };
@@ -1433,7 +1437,7 @@ function applySettings(saved) {
   }
   var sliderDefs = [
     ['fontSize','fontSizeVal', function(v){return v+'px';}],
-    ['lineGap','lineGapVal',   function(v){return (1+v/42).toFixed(1)+'x';}],
+    ['lineGap','lineGapVal',   function(v){return ((cfg.fontSize+v)/cfg.fontSize).toFixed(1)+'x';}],
     ['paraGap','paraGapVal',   function(v){return v+'px';}],
     ['padding','paddingVal',   function(v){return v+'px';}],
   ];
@@ -1521,6 +1525,20 @@ function applySettings(saved) {
     var el2 = document.getElementById('bgImgDim');
     if (el2) { el2.value = Math.round(saved.bgImgDim*100); document.getElementById('bgImgDimVal').textContent = el2.value+'%'; }
   }
+  // 대사 색상 복원
+  if (saved.dialogueColor) {
+    cfg.dialogueColor = saved.dialogueColor;
+    var wrap = document.getElementById('dialogueSwatchWrap');
+    var toggleBtn = document.getElementById('dialogueColorToggle');
+    if (wrap) { wrap.style.background = saved.dialogueColor; wrap.style.display = 'block'; }
+    if (toggleBtn) toggleBtn.textContent = '기본값으로';
+  } else {
+    cfg.dialogueColor = null;
+    var wrap2 = document.getElementById('dialogueSwatchWrap');
+    var toggleBtn2 = document.getElementById('dialogueColorToggle');
+    if (wrap2) wrap2.style.display = 'none';
+    if (toggleBtn2) toggleBtn2.textContent = '기본값 사용';
+  }
   render();
 }
 
@@ -1569,6 +1587,8 @@ function renderSlotList() {
           var slots2 = loadSlots();
           slots2[idx].name = newName;
           saveSlots(slots2);
+          renderSlotList();
+          showToast('✓ 이름이 변경되었습니다');
           });
       });
     })(i, slot.name);
